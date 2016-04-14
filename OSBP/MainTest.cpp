@@ -2,9 +2,9 @@
 #include <GL\glew.h>
 #include <GL\freeglut.h>
 
-#include "Shader.h"
+#include "ShaderProgram.h"
 
-Shader* shader = NULL;
+ShaderProgram* shader = NULL;
 
 // Initialization function
 static void Init()
@@ -21,9 +21,12 @@ static void Init()
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glEnable(GL_DEPTH_TEST);
 
-  shader = new Shader();
-  shader->CreateShader("C://Users//Rustam//Projetos//VisualStudio//Projects//OSBP//OSBP//vshader.vert", GL_VERTEX_SHADER);
-  shader->CreateShader("C://Users//Rustam//Projetos//VisualStudio//Projects//OSBP//OSBP//fshader.frag", GL_FRAGMENT_SHADER);
+  shader = new ShaderProgram();
+  shader->CreateShader("vshader.vert", GL_VERTEX_SHADER);
+  shader->CreateShader("fshader.frag", GL_FRAGMENT_SHADER);
+  glBindAttribLocation(shader->m_id, 0, "myVertex");
+  glBindAttribLocation(shader->m_id, 1, "color");
+  shader->LinkProgram();
 }
 
 // Reshape callback

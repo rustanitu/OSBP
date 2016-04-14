@@ -148,10 +148,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MainTest.cpp" />
-    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderProgram.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fshader.frag" />

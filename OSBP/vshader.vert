@@ -1,5 +1,5 @@
-layout(location = 0) in vec4 myVertex;
-layout(location = 1) in vec4 color;
+in vec4 myVertex;
+in vec4 color;
 
 out vec4 fcolor;
 void main (void)
