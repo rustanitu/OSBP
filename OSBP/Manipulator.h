@@ -6,11 +6,12 @@
 #ifndef V_MANIPULATOR_H
 #define V_MANIPULATOR_H
 
+#include <glm\mat4x4.hpp>
+
 class VManipulator
 {
 private:
-	float m_matrix[16];
-	float m_invMatrix[16];
+	glm::mat4* m_matrix;
 	float m_zcenter;
 	VManipulator* m_next;
 	static VManipulator* s_current;
@@ -19,15 +20,13 @@ public:
 	static VManipulator* getCurrent ();
 	static void setCurrent (VManipulator* manipulator);
 
-	VManipulator ();
+	VManipulator(glm::mat4* matrix);
 	void setZCenter (float zcenter);
-	void load ();
-	void unLoad ();
-	void identity();
+	void centralize ();
+	void decentralize ();
 	void rotate (float angle, float rx, float ry, float rz);
 	void scale (float sx, float sy, float sz);
 	float getYRotation ();
-	float* getInverseMatrix ();
 
 };
 

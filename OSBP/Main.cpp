@@ -49,7 +49,7 @@ static void Init()
 
   manip = new VManipulator(&cam->m_view);
 
-  triangle.SetVerticesAttribute(0);
+  //triangle.SetVerticesAttribute(0);
   //triangle.SetColorsAttribute(1);
   sphere.SetVerticesAttribute(0);
   sphere.SetColorsAttribute(1);

@@ -1,5 +1,8 @@
 #include"Sphere.h"
-#include"Material.h"
+
+#include <math.h>
+
+#define PI 3.14159265359
 
 Sphere::Sphere(float radius, int nslices, int nstacks)
 {
@@ -9,80 +12,70 @@ Sphere::Sphere(float radius, int nslices, int nstacks)
 
 	tx_theta = (2 * PI) / nslices;
 	tx_phi = (PI) / nstacks;
-	float ***m = (float***)malloc((nstacks + 1)*sizeof(float**));
-	for (i = 0; i < nstacks; i++)
-	{
-		phi = tx_phi*i;
-		m[i] = (float**)malloc((nslices + 1)*sizeof(float*));
-		for (j = 0; j < nslices; j++)
-		{
-			m[i][j] = (float*)malloc(3 * sizeof(float));
-			theta = tx_theta*j;
-			x = radius*cos(theta)*sin(phi);
-			y = radius*cos(phi);
-			z = radius*sin(theta)*sin(phi);
-			m[i][j][0] = x;
-			m[i][j][1] = y;
-			m[i][j][2] = z;
-		}
-		m[i][j] = (float*)malloc(3 * sizeof(float));
-		theta = 0;
-		x = radius*cos(theta)*sin(phi);
-		y = radius*cos(phi);
-		z = radius*sin(theta)*sin(phi);
-		m[i][j][0] = x;
-		m[i][j][1] = y;
-		m[i][j][2] = z;
-	}
-	phi = tx_phi*i;
-	m[i] = (float**)malloc((nslices + 1)*sizeof(float*));
-	for (j = 0; j < nslices; j++)
-	{
-		m[i][j] = (float*)malloc(3 * sizeof(float));
-		theta = tx_theta*j;
-		x = radius*cos(theta)*sin(phi);
-		y = radius*cos(phi);
-		z = radius*sin(theta)*sin(phi);
-		m[i][j][0] = x;
-		m[i][j][1] = y;
-		m[i][j][2] = z;
-	}
-	m[i][j] = (float*)malloc(3 * sizeof(float));
-	theta = 0;
-	x = radius*cos(theta)*sin(phi);
-	y = radius*cos(phi);
-	z = radius*sin(theta)*sin(phi);
-	m[i][j][0] = x;
-	m[i][j][1] = y;
-	m[i][j][2] = z;
+	float*** grid = new float**[nstacks + 1];
+  for (i = 0; i <= nstacks; i++)
+  {
+    phi = tx_phi*i;
+    grid[i] = new float*[nslices + 1];
+    for (j = 0; j <= nslices; j++)
+    {
+      grid[i][j] = new float[3];
+      theta = (j < nslices) ? tx_theta*j : 0.0f;
+      x = radius*cos(theta)*sin(phi);
+      y = radius*cos(phi);
+      z = radius*sin(theta)*sin(phi);
+      grid[i][j][0] = x;
+      grid[i][j][1] = y;
+      grid[i][j][2] = z;
+    }
+  }
 
-	total = nslices*(nstacks)* 2;
-	face = (Face**)malloc(total*sizeof(Face*));
-	int k = 0;
-	for (i = 0; i<nslices; i++)
+  m_size = nslices * nstacks * 6;
+  m_vertices = new float[m_size * 3];
+  int k = 0;
+	for (i = 0; i < nslices; i++)
 	{
-		for (j = 0; j<nstacks; j++)
+		for (j = 0; j < nstacks; j++)
 		{
-			face[k++] = new Face(m[j][i], m[j][i + 1], m[j + 1][i]);
-			face[k++] = new Face(m[j + 1][i], m[j][i + 1], m[j + 1][i + 1]);
+      m_vertices[k++] = grid[j][i][0];
+      m_vertices[k++] = grid[j][i][1];
+      m_vertices[k++] = grid[j][i][2];
+      m_vertices[k++] = grid[j][i + 1][0];
+      m_vertices[k++] = grid[j][i + 1][1];
+      m_vertices[k++] = grid[j][i + 1][2];
+      m_vertices[k++] = grid[j + 1][i][0];
+      m_vertices[k++] = grid[j + 1][i][1];
+      m_vertices[k++] = grid[j + 1][i][2];
+      m_vertices[k++] = grid[j + 1][i][0];
+      m_vertices[k++] = grid[j + 1][i][1];
+      m_vertices[k++] = grid[j + 1][i][2];
+      m_vertices[k++] = grid[j][i + 1][0];
+      m_vertices[k++] = grid[j][i + 1][1];
+      m_vertices[k++] = grid[j][i + 1][2];
+      m_vertices[k++] = grid[j + 1][i + 1][0];
+      m_vertices[k++] = grid[j + 1][i + 1][1];
+      m_vertices[k++] = grid[j + 1][i + 1][2];
 		}
 	}
+
+  delete grid;
 }
 
 // draw sphere
-void Sphere::draw(unsigned int primitive)
+void Sphere::Draw()
 {
-	glBegin(GL_TRIANGLES);
-	int i = 0;
-	while (i < total)
-	{
-		glNormal3fv(face[i]->Vi);
-		glVertex3fv(face[i]->Vi);
-		glNormal3fv(face[i]->Vj);
-		glVertex3fv(face[i]->Vj);
-		glNormal3fv(face[i]->Vk);
-		glVertex3fv(face[i]->Vk);
-		i++;
-	}
-	glEnd();
+  glVertexAttribPointer(m_vid, 3, GL_FLOAT, GL_FALSE, 0, m_vertices);
+  glEnableVertexAttribArray(m_vid);
+  glVertexAttribPointer(m_cid, 3, GL_FLOAT, GL_FALSE, 0, m_vertices);
+  glEnableVertexAttribArray(m_cid);
+  glDrawArrays(GL_TRIANGLES, 0, m_size);
+}
+
+void Sphere::DrawWire()
+{
+  glVertexAttribPointer(m_vid, 3, GL_FLOAT, GL_FALSE, 0, m_vertices);
+  glEnableVertexAttribArray(m_vid);
+  glVertexAttribPointer(m_cid, 3, GL_FLOAT, GL_FALSE, 0, m_vertices);
+  glEnableVertexAttribArray(m_cid);
+  glDrawArrays(GL_LINES, 0, m_size);
 }

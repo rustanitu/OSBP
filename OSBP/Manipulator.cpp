@@ -4,8 +4,8 @@
 // PUC-Rio, set 2010
 
 #include "Manipulator.h"
-#include "vector.h"
-
+#include <glm\vec3.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,9 +21,9 @@ VManipulator* VManipulator::s_current = 0;
 static char g_state = ' ';
 static int g_x0, g_y0;
 
-static VVector map (int x, int y)
+static glm::vec3 map (int x, int y)
 {
-	VVector v;
+	glm::vec3 v;
 	int vp[4];
 	glGetIntegerv(GL_VIEWPORT,vp);
 	int radius = vp[2] < vp[3] ? vp[2]/2 : vp[3]/2;
@@ -64,11 +64,10 @@ static void motion (int x, int y)
 	int dy = abs(y-g_y0);
 	if ( dx > 1 || dy > 1) {
 		if (g_state == 'r') {
-			VVector v0 = map(g_x0, g_y0);
-			VVector v1 = map(x, y);
-			VVector r = Cross(v0, v1);
-			VManipulator::getCurrent()->rotate(TORAD(2*asin(r.length())),r.x,r.y,r.z);
-
+			glm::vec3 v0 = map(g_x0, g_y0);
+			glm::vec3 v1 = map(x, y);
+			glm::vec3 r = glm::cross(v0, v1);
+			VManipulator::getCurrent()->rotate(TORAD(2*asin(glm::length(r))),r.x,r.y,r.z);
 		}
 		else if (g_state == 's') {
 			int vp[4];
@@ -91,13 +90,14 @@ VManipulator* VManipulator::getCurrent ()
 	return s_current;
 }
 
-VManipulator::VManipulator ()
+VManipulator::VManipulator(glm::mat4* matrix)
 {
-	identity();
+	m_matrix = matrix;
 	glutMouseFunc(mouse);
 	glutMotionFunc(motion);
 	setCurrent(this);
 	m_next = NULL;
+  m_zcenter = 0.0f;
 }
 
 void VManipulator::setZCenter (float zcenter)
@@ -105,77 +105,28 @@ void VManipulator::setZCenter (float zcenter)
 	m_zcenter = zcenter;
 }
 
-void VManipulator::identity ()
-{
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glGetFloatv(GL_MODELVIEW_MATRIX, m_matrix);
-	glGetFloatv(GL_MODELVIEW_MATRIX, m_invMatrix);
-	glPopMatrix();
-	glPopAttrib();
-}
-
 void VManipulator::rotate (float angle, float rx, float ry, float rz)
 {
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glRotatef(angle, rx, ry, rz);
-	glMultMatrixf(m_matrix);
-	glGetFloatv(GL_MODELVIEW_MATRIX, m_matrix);
-
-	glLoadIdentity();
-	glMultMatrixf(m_invMatrix);
-	glRotatef(-angle, rx, ry, rz);
-	glGetFloatv(GL_MODELVIEW_MATRIX, m_invMatrix);
-
-	glPopMatrix();
-	glPopAttrib();
+  *m_matrix = glm::rotate(*m_matrix, angle, glm::vec3(rx, ry, rz));
 }
 
 void VManipulator::scale (float sx, float sy, float sz)
 {
-	glPushAttrib(GL_TRANSFORM_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glScalef(sx, sy, sz);
-	glMultMatrixf(m_matrix);
-	glGetFloatv(GL_MODELVIEW_MATRIX, m_matrix);
-
-	glLoadIdentity();
-	glMultMatrixf(m_invMatrix);
-	glScalef(1/sx, 1/sy, 1/sz);
-	glGetFloatv(GL_MODELVIEW_MATRIX,m_invMatrix);
-
-	glPopMatrix();
-	glPopAttrib();
+  *m_matrix = glm::scale(*m_matrix, glm::vec3(sx, sy, sz));
 }
 
-void VManipulator::load ()
+void VManipulator::centralize ()
 {
-	glTranslatef(0.0f, 0.0f, -m_zcenter);
-	glMultMatrixf(m_matrix);
-	glTranslatef(0.0f, 0.0f, m_zcenter);
+  *m_matrix = glm::translate(*m_matrix, glm::vec3(0, 0, -m_zcenter));
 }
 
-float* VManipulator::getInverseMatrix ()
+void VManipulator::decentralize ()
 {
-	return m_invMatrix;
-}
-
-void VManipulator::unLoad ()
-{
-	glTranslatef(0.0f, 0.0f, -m_zcenter);
-	glMultMatrixf(m_invMatrix);
-	glTranslatef(0.0f, 0.0f, m_zcenter);
+  *m_matrix = glm::translate(*m_matrix, glm::vec3(0, 0, m_zcenter));
 }
 
 float VManipulator::getYRotation ()
 {
-	float rad = -m_matrix[8];
+	float rad = -(*m_matrix)[2][0];
 	return (rad==0) ? 0 : (rad/abs(rad))*asin(rad)*(360.0/(2*PI));
 }
