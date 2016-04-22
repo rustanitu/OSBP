@@ -5,6 +5,8 @@
 #include "Camera.h"
 #include "ShaderProgram.h"
 #include "Triangle.h"
+#include "Sphere.h"
+#include "Manipulator.h"
 
 #include <glm\gtc\matrix_transform.hpp>
 
@@ -13,7 +15,10 @@ const int H = 600;
 ShaderProgram* shader = NULL;
 Camera* cam = NULL;
 Triangle triangle;
+Sphere sphere;
 GLuint vao;
+VManipulator* manip = NULL;
+
 
 // Initialization function
 static void Init()
@@ -39,9 +44,15 @@ static void Init()
   shader->LinkProgram();
 
   cam = new Camera(W, H);
+  cam->SetEye(0, 0, 2);
+  cam->SetupCamera();
+
+  manip = new VManipulator(&cam->m_view);
 
   triangle.SetVerticesAttribute(0);
-  triangle.SetColorsAttribute(1);
+  //triangle.SetColorsAttribute(1);
+  sphere.SetVerticesAttribute(0);
+  sphere.SetColorsAttribute(1);
 }
 
 // Reshape callback5
@@ -58,7 +69,8 @@ static void DrawScene()
   glm::mat4 mvp = cam->m_proj * cam->m_view;
   GLuint MatrixID = glGetUniformLocation(shader->m_id, "mvp");
   glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-  triangle.Draw();
+  //triangle.Draw();
+  sphere.Draw();
 }
 
 // Display callback

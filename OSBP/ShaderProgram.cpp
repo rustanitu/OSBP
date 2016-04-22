@@ -1,9 +1,11 @@
 #include "ShaderProgram.h"
 
 #include <stdio.h>
+#include <string>
 
 
 ShaderProgram::ShaderProgram()
+  : m_vid(0), m_fid(0), m_bufsize(0)
 {
   m_id = glCreateProgram();
   if (m_id == 0)
@@ -12,6 +14,7 @@ ShaderProgram::ShaderProgram()
 
 ShaderProgram::~ShaderProgram()
 {
+  delete m_buffers;
 }
 
 void ShaderProgram::CompileShader(GLuint id)
@@ -46,29 +49,45 @@ void ShaderProgram::LinkProgram()
   }
 }
 
-void ShaderProgram::CreateShader(const char* filepath, GLenum type)
+void ShaderProgram::CreateShader(const char** shader, GLenum type)
 {
   GLuint id = glCreateShader(type);
-
   if (id == 0)
     Error("Could not create vertex shader object");
 
+  glShaderSource(id, 1, shader, 0);
+  CompileShader(id);
+  glAttachShader(m_id, id);
+
+  switch (type)
+  {
+    case GL_VERTEX_SHADER:
+      m_vid = id;
+      break;
+    case GL_FRAGMENT_SHADER:
+      m_fid = id;
+      break;
+  }
+}
+
+void ShaderProgram::CreateShader(const char* filepath, GLenum type)
+{
   FILE* file = new FILE();
   if (!file)
     return;
 
-  fopen_s(&file, filepath, "r");
+  fopen_s(&file, filepath, "rb");
   fseek(file, 0, SEEK_END);
   long size = ftell(file);
   rewind(file);
 
-  char* strfile = new char[size];
+  char* strfile = new char[size + 1];
   fread(strfile, sizeof(char), size, file);
+  strfile[size] = '\0';
+  
+  CreateShader((const char**)&strfile, type);
+  delete strfile;
 
-  glShaderSource(id, 1, &strfile, 0);
-  CompileShader(id);
-
-  glAttachShader(m_id, id);
   fclose(file);
 }
 

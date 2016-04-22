@@ -10,7 +10,7 @@ Camera::Camera(int width, int height)
   m_at = glm::vec3(0, 0, -1);
   m_up = glm::vec3(0, 1, 0);
 
-  m_fov = 60;
+  m_fov = 90;
   m_near = 1;
   m_far = 1000;
   SetupCamera();
