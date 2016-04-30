@@ -1,0 +1,4 @@
+Acertar dependencias...Lib e Include. (ps: fazer global no note para facilitar outros projetos, criar arquivo base de propriedades que já aponta para a posta de include ../)
+
+Complementar API de shader incluindo uniform variable (só para o que vai ser utilizado por enquanto).
+Depois complementar a API.

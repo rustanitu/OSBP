@@ -4,6 +4,9 @@
 #include <GL\glew.h>
 #include <GL\freeglut.h>
 #include <map>
+#include <glm\vec3.hpp>
+#include <glm\vec4.hpp>
+#include <glm\mat4x4.hpp>
 
 class ShaderProgram
 {
@@ -76,11 +79,33 @@ public:
     m_attributes.insert(std::make_pair(name, id));
   }
 
-  void SetUniform(const char* name, void * uniform)
+  void UseProgram()
   {
-    GLuint id;
-    glGenBuffers(1, &id);
-    m_attributes.insert(std::make_pair(name, id));
+    glUseProgram(m_id);
+  }
+
+  void SetUniform(const char* name, float uniform)
+  {
+    GLuint id = glGetUniformLocation(m_id, name);
+    glUniform1f(id, uniform);
+  }
+
+  void SetUniform(const char* name, glm::vec3 uniform)
+  {
+    GLuint id = glGetUniformLocation(m_id, name);
+    glUniform3fv(id, 1, &uniform[0]);
+  }
+
+  void SetUniform(const char* name, glm::vec4 uniform)
+  {
+    GLuint id = glGetUniformLocation(m_id, name);
+    glUniform4fv(id, 1, &uniform[0]);
+  }
+
+  void SetUniform(const char* name, glm::mat4 uniform)
+  {
+    GLuint id = glGetUniformLocation(m_id, name);
+    glUniformMatrix4fv(id, 1, GL_FALSE, &uniform[0][0]);
   }
 
   void SetAttrib(const char* name, void * attrib)

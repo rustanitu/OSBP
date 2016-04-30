@@ -32,10 +32,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vshader.vert">
+    <None Include="fshader.frag.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="fshader.frag">
+    <None Include="vshader.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

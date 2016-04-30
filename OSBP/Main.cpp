@@ -14,9 +14,8 @@ const int W = 800;
 const int H = 600;
 ShaderProgram* shader = NULL;
 Camera* cam = NULL;
-Triangle triangle;
 Sphere sphere;
-GLuint vao;
+GLuint vao, vbo[1];
 VManipulator* manip = NULL;
 
 
@@ -36,10 +35,13 @@ static void Init()
   glEnable(GL_DEPTH_TEST);
 
   shader = new ShaderProgram();
-  shader->CreateShader("vshader.vert", GL_VERTEX_SHADER);
-  shader->CreateShader("fshader.frag", GL_FRAGMENT_SHADER);
-  glBindAttribLocation(shader->m_id, 0, "myVertex");
-  glBindAttribLocation(shader->m_id, 1, "color");
+  shader->CreateShader("vshader.vert.glsl", GL_VERTEX_SHADER);
+  shader->CreateShader("fshader.frag.glsl", GL_FRAGMENT_SHADER);
+  glBindAttribLocation(shader->m_id, 0, "vertex");
+  glBindAttribLocation(shader->m_id, 1, "normal");
+
+  glGenVertexArrays(1, &vao);
+  glGenBuffers(1, vbo);
 
   shader->LinkProgram();
 
@@ -49,8 +51,6 @@ static void Init()
 
   manip = new VManipulator(&cam->m_view);
 
-  //triangle.SetVerticesAttribute(0);
-  //triangle.SetColorsAttribute(1);
   sphere.SetVerticesAttribute(0);
   sphere.SetColorsAttribute(1);
 }
@@ -58,18 +58,31 @@ static void Init()
 // Reshape callback5
 static void Reshape(int w, int h)
 {
-  //cam->SetViewport(w, h);
-  //cam->SetupCamera();
+  glViewport(0, 0, w, h);
+  cam->SetViewport(w, h);
+  cam->SetupCamera();
 }
 
 // Draw scene //
 static void DrawScene()
 {
-  glUseProgram(shader->m_id);
+  glClear(GL_COLOR_BUFFER_BIT);
+  shader->UseProgram();
+
   glm::mat4 mvp = cam->m_proj * cam->m_view;
-  GLuint MatrixID = glGetUniformLocation(shader->m_id, "mvp");
-  glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-  //triangle.Draw();
+  shader->SetUniform("mvp", mvp);
+  shader->SetUniform("model", glm::mat4());
+  shader->SetUniform("tinv_model", glm::transpose(glm::inverse(glm::mat4())));
+
+  shader->SetUniform("light", cam->GetEye());
+  shader->SetUniform("eye", cam->GetEye());
+
+  glm::vec3 blue = glm::vec3(0.1, 0.1, 0.4);
+  shader->SetUniform("amb", blue * 0.25f);
+  shader->SetUniform("diff", blue * 0.5f);
+  shader->SetUniform("spec", glm::vec3(0.1, 0.1, 0.1) * 5.0f);
+  shader->SetUniform("shi", 100);
+
   sphere.Draw();
 }
 
@@ -92,7 +105,7 @@ int main (int argc, char* argv[])
   glutInitWindowSize(W, H);
 
   // create window
-  glutCreateWindow("Triangle");
+  glutCreateWindow("Bump Mapping Sphere");
   glutReshapeFunc(Reshape);
   glutDisplayFunc(Display);
 

@@ -18,6 +18,12 @@ public:
   void SetViewport(int width, int height);
   void SetupCamera();
 
+  // Getters
+  glm::vec3 GetEye()
+  {
+    return m_eye;
+  }
+
   // Camera Trsnformations
   void Translate(float tx, float ty, float tz);
   void Translate(glm::vec3 t);
