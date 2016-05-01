@@ -62,28 +62,32 @@ Sphere::Sphere(float radius, int nslices, int nstacks)
 }
 
 // draw sphere
+
+void Sphere::TransferData()
+{
+  glBindVertexArray(m_vao);
+
+  glBindBuffer(m_bufferTypes["vertex"], m_buffers["vertex"]);
+  glBufferData(GL_ARRAY_BUFFER, 3 * m_size * sizeof(float), (void*)m_vertices, GL_STATIC_DRAW);
+
+  //glBindBuffer(m_bufferTypes["normal"], m_buffers["normal"]);
+  //glBufferData(GL_ARRAY_BUFFER, 3 * m_size * sizeof(float), (void*)m_vertices, GL_STATIC_DRAW);
+}
+
 void Sphere::Draw()
 {
-  glBindVertexArray(1);
-  glBindBuffer(GL_ARRAY_BUFFER, 1);
-  glBindBuffer(GL_ARRAY_BUFFER, 2);
+  glVertexAttribPointer(m_attributes["vertex"], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(m_attributes["vertex"]);
 
-  glBufferData(GL_ARRAY_BUFFER, 3 * m_size * sizeof(float), (void*)m_vertices, GL_STATIC_DRAW);
-  
-  glVertexAttribPointer(m_vid, 3, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(m_vid);
-
-  glVertexAttribPointer(m_cid, 3, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(m_cid);
+  glVertexAttribPointer(m_attributes["normal"], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(m_attributes["normal"]);
 
   glDrawArrays(GL_TRIANGLES, 0, m_size);
 }
 
 void Sphere::DrawWire()
 {
-  glVertexAttribPointer(m_vid, 3, GL_FLOAT, GL_FALSE, 0, m_vertices);
-  glEnableVertexAttribArray(m_vid);
-  glVertexAttribPointer(m_cid, 3, GL_FLOAT, GL_FALSE, 0, m_vertices);
-  glEnableVertexAttribArray(m_cid);
+  ShaderObject::InitDraw();
+  TransferData();
   glDrawArrays(GL_LINES, 0, m_size);
 }

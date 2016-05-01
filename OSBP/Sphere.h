@@ -4,28 +4,21 @@
 #include <GL\glew.h>
 #include <GL\freeglut.h>
 
-class Sphere
+#include "ShaderObject.h"
+
+class Sphere : public ShaderObject
 {
 public:
 	Sphere(float r = 1, int nsl = 64, int nst = 32);
 
+  void TransferData();
 	void Draw();
-  void DrawWire();
-
-  void SetVerticesAttribute(GLuint id)
-  {
-    m_vid = id;
-  }
-
-  void SetColorsAttribute(GLuint id)
-  {
-    m_cid = id;
-  }
+	void DrawWire();
+  void EndDraw() {}
 
 private:
-  float *m_vertices;
-  int m_size;
-  int m_vid, m_cid;
+	float *m_vertices;
+	int m_size;
 
 };
 

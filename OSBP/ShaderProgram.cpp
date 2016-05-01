@@ -5,7 +5,10 @@
 
 
 ShaderProgram::ShaderProgram()
-  : m_vid(0), m_fid(0), m_bufsize(0)
+{
+}
+
+void ShaderProgram::Init()
 {
   m_id = glCreateProgram();
   if (m_id == 0)
@@ -14,7 +17,6 @@ ShaderProgram::ShaderProgram()
 
 ShaderProgram::~ShaderProgram()
 {
-  delete m_buffers;
 }
 
 void ShaderProgram::CompileShader(GLuint id)
@@ -58,16 +60,6 @@ void ShaderProgram::CreateShader(const char** shader, GLenum type)
   glShaderSource(id, 1, shader, 0);
   CompileShader(id);
   glAttachShader(m_id, id);
-
-  switch (type)
-  {
-    case GL_VERTEX_SHADER:
-      m_vid = id;
-      break;
-    case GL_FRAGMENT_SHADER:
-      m_fid = id;
-      break;
-  }
 }
 
 void ShaderProgram::CreateShader(const char* filepath, GLenum type)

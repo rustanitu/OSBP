@@ -3,7 +3,6 @@
 
 #include <GL\glew.h>
 #include <GL\freeglut.h>
-#include <map>
 #include <glm\vec3.hpp>
 #include <glm\vec4.hpp>
 #include <glm\mat4x4.hpp>
@@ -19,6 +18,7 @@ public:
   };
 
   ShaderProgram();
+  void Init();
   ~ShaderProgram();
 
   // Link Shader //
@@ -28,55 +28,9 @@ public:
   void CreateShader(const char* filepath, GLenum type);
   void CreateShader(const char** shader, GLenum type);
 
-  // Buffer Management
-  GLuint CreateBuffer(GLsizei n)
+  GLuint GetId()
   {
-    GLuint* buffers = new GLuint[n];
-    glGenBuffers(n, buffers);
-
-    GLuint first;
-    if (!m_buffers)
-    {
-      m_buffers = buffers;
-      m_bufsize = n;
-      first = buffers[0];
-    }
-    else
-    {
-      m_buffers = (GLuint*)realloc(m_buffers, m_bufsize + n);
-      m_buffers = (GLuint*)memcpy(m_buffers + m_bufsize, buffers, n);
-      m_bufsize = m_bufsize + n;
-      first = buffers[0];
-      delete buffers;
-    }
-
-    return first;
-  }
-
-  void DeleteBuffer(GLuint first, GLsizei n)
-  {
-    glDeleteBuffers(n, &m_buffers[first]);
-  }
-
-  void BindBuffer(GLuint id, GLenum type)
-  {
-    glBindBuffer(type, m_buffers[id]);
-  }
-
-  void ConectBuffer(GLenum type)
-  {
-    //switch (type)
-    //{
-    //  case GL_ARRAY_BUFFER:
-    //    glVertexAttribPointer(id, n, GL_FLOAT, GL_FALSE, 0, 0, vertices);
-    //}
-  }
-
-  void SetVao(const char* name, void * attrib)
-  {
-    GLuint id;
-    glGenVertexArrays(1, &id);
-    m_attributes.insert(std::make_pair(name, id));
+    return m_id;
   }
 
   void UseProgram()
@@ -108,13 +62,6 @@ public:
     glUniformMatrix4fv(id, 1, GL_FALSE, &uniform[0][0]);
   }
 
-  void SetAttrib(const char* name, void * attrib)
-  {
-    GLuint id;
-    glGenBuffers(1, &id);
-    m_attributes.insert(std::make_pair(name, id));
-  }
-
 private:
   void Error(const char* err);
 
@@ -123,13 +70,6 @@ private:
 
 public:
   GLuint m_id;
-  GLuint m_vid;
-  GLuint m_fid;
-
-private:
-  GLuint* m_buffers;
-  GLsizei m_bufsize;
-  std::map<const char*, GLuint> m_attributes;
 };
 
 #endif

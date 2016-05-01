@@ -35,13 +35,13 @@ static void Init()
   glEnable(GL_DEPTH_TEST);
 
   shader = new ShaderProgram();
+  shader->Init();
   shader->CreateShader("vshader.vert.glsl", GL_VERTEX_SHADER);
   shader->CreateShader("fshader.frag.glsl", GL_FRAGMENT_SHADER);
-  glBindAttribLocation(shader->m_id, 0, "vertex");
-  glBindAttribLocation(shader->m_id, 1, "normal");
-
-  glGenVertexArrays(1, &vao);
-  glGenBuffers(1, vbo);
+  sphere.Init();
+  sphere.SetAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  sphere.SetAttribute("normal", 1, GL_ARRAY_BUFFER);
+  sphere.TransferData();
 
   shader->LinkProgram();
 
@@ -51,8 +51,6 @@ static void Init()
 
   manip = new VManipulator(&cam->m_view);
 
-  sphere.SetVerticesAttribute(0);
-  sphere.SetColorsAttribute(1);
 }
 
 // Reshape callback5
@@ -79,7 +77,7 @@ static void DrawScene()
 
   glm::vec3 blue = glm::vec3(0.1, 0.1, 0.4);
   shader->SetUniform("amb", blue * 0.25f);
-  shader->SetUniform("diff", blue * 0.5f);
+  shader->SetUniform("diff", glm::vec3(0.9, 0.9, 0.2) * 0.5f);
   shader->SetUniform("spec", glm::vec3(0.1, 0.1, 0.1) * 5.0f);
   shader->SetUniform("shi", 100);
 
