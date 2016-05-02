@@ -38,6 +38,12 @@ public:
     glUseProgram(m_id);
   }
 
+  void SetUniform(const char* name, GLuint uniform)
+  {
+    GLuint id = glGetUniformLocation(m_id, name);
+    glUniform1i(id, uniform);
+  }
+
   void SetUniform(const char* name, float uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);

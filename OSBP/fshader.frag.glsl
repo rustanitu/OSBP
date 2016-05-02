@@ -1,14 +1,16 @@
 #version 450
 
 in vec3 wrl_position;  
-in vec3 wrl_normal;  
-  
+in vec3 wrl_normal;
+in vec2 st;
+
 uniform vec3 light; 
 uniform vec3 eye;
 uniform vec3 amb;
 uniform vec3 diff;
 uniform vec3 spec;
 uniform float shi;
+uniform sampler2D difftexture;
 
 out vec3 color;
 void main()
@@ -27,5 +29,6 @@ void main()
    cspec = clamp(cspec, 0.0f, 1.0f);
    
    // Final Color
-   color = amb + cdiff + cspec; 
+   color = amb + cdiff + cspec;
+   color *= texture( difftexture, st ).rgb;
 } 

@@ -5,9 +5,10 @@ ShaderObject::ShaderObject()
 {
 }
 
-void ShaderObject::Init()
+void ShaderObject::Init(ShaderProgram* shader)
 {
   glGenVertexArrays(1, &m_vao);
+  m_shader = shader;
 }
 
 ShaderObject::~ShaderObject()
@@ -22,7 +23,7 @@ ShaderObject::~ShaderObject()
 void ShaderObject::SetAttribute(std::string name, GLuint location, GLenum bufferType)
 {
   m_attributes.insert(std::make_pair(name, location));
-  glBindAttribLocation(m_shader.GetId(), location, name.c_str());
+  glBindAttribLocation(m_shader->GetId(), location, name.c_str());
 
   GLuint id;
   glGenBuffers(1, &id);

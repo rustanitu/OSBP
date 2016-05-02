@@ -7,6 +7,7 @@
 #include "Triangle.h"
 #include "Sphere.h"
 #include "Manipulator.h"
+#include "ShaderTexture.h"
 
 #include <glm\gtc\matrix_transform.hpp>
 
@@ -17,6 +18,7 @@ Camera* cam = NULL;
 Sphere sphere;
 GLuint vao, vbo[1];
 VManipulator* manip = NULL;
+ShaderTexture tex;
 
 
 // Initialization function
@@ -38,10 +40,12 @@ static void Init()
   shader->Init();
   shader->CreateShader("vshader.vert.glsl", GL_VERTEX_SHADER);
   shader->CreateShader("fshader.frag.glsl", GL_FRAGMENT_SHADER);
-  sphere.Init();
+  sphere.Init(shader);
   sphere.SetAttribute("vertex", 0, GL_ARRAY_BUFFER);
   sphere.SetAttribute("normal", 1, GL_ARRAY_BUFFER);
+  sphere.SetAttribute("texcoord", 2, GL_ARRAY_BUFFER);
   sphere.TransferData();
+  tex.Init("eyetexture.bmp");
 
   shader->LinkProgram();
 
@@ -50,7 +54,6 @@ static void Init()
   cam->SetupCamera();
 
   manip = new VManipulator(&cam->m_view);
-
 }
 
 // Reshape callback5
@@ -79,8 +82,11 @@ static void DrawScene()
   shader->SetUniform("amb", blue * 0.25f);
   shader->SetUniform("diff", glm::vec3(0.9, 0.9, 0.2) * 0.5f);
   shader->SetUniform("spec", glm::vec3(0.1, 0.1, 0.1) * 5.0f);
-  shader->SetUniform("shi", 100);
+  shader->SetUniform("shi", 100.0f);
 
+  shader->SetUniform("difftexture", tex.m_id);
+
+  tex.LoadTexture();
   sphere.Draw();
 }
 
