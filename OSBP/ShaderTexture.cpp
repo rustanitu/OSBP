@@ -1,10 +1,9 @@
 #include "ShaderTexture.h"
 
-#include <GL\glew.h>
 #include <GL\freeglut.h>
 
 
-ShaderTexture::ShaderTexture()
+ShaderTexture::ShaderTexture() : m_bmp(NULL)
 {
 }
 
@@ -15,7 +14,7 @@ ShaderTexture::~ShaderTexture()
 
 void ShaderTexture::Init(char* file)
 {
-  bmpfile = readBmpFile(file);
+  m_bmp = imgReadBMP(file);
   glGenTextures(1, &m_id);
 }
 
@@ -24,7 +23,7 @@ void ShaderTexture::LoadTexture()
   glEnable(GL_TEXTURE_2D);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_id);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, getWidth(bmpfile), getHeight(bmpfile), 0, GL_BGR, GL_FLOAT, getData(bmpfile));
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgGetWidth(m_bmp), imgGetHeight(m_bmp), 0, GL_RGB, GL_FLOAT, imgGetData(m_bmp));
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

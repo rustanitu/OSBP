@@ -45,7 +45,7 @@ static void Init()
   sphere.SetAttribute("normal", 1, GL_ARRAY_BUFFER);
   sphere.SetAttribute("texcoord", 2, GL_ARRAY_BUFFER);
   sphere.TransferData();
-  tex.Init("eyetexture.bmp");
+  tex.Init("world.bmp");
 
   shader->LinkProgram();
 
@@ -79,12 +79,12 @@ static void DrawScene()
   shader->SetUniform("eye", cam->GetEye());
 
   glm::vec3 blue = glm::vec3(0.1, 0.1, 0.4);
-  shader->SetUniform("amb", blue * 0.25f);
-  shader->SetUniform("diff", glm::vec3(0.9, 0.9, 0.2) * 0.5f);
-  shader->SetUniform("spec", glm::vec3(0.1, 0.1, 0.1) * 5.0f);
+  shader->SetUniform("amb", blue * 0.8f);
+  shader->SetUniform("diff", glm::vec3(0.9, 0.9, 0.4) * 0.5f);
+  shader->SetUniform("spec", glm::vec3(0.1, 0.1, 0.1) * 8.0f);
   shader->SetUniform("shi", 100.0f);
 
-  shader->SetUniform("difftexture", tex.m_id);
+  shader->SetUniform("difftexture", (GLuint)0);
 
   tex.LoadTexture();
   sphere.Draw();

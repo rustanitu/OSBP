@@ -1,7 +1,9 @@
 #ifndef SHADER_TEXTURE_H
 #define SHADER_TEXTURE_H
 
-#include <Image\BmpReader.h>
+extern "C" {
+#include <Image\image.h>
+}
 #include <GL\glew.h>
 
 class ShaderTexture
@@ -15,7 +17,7 @@ public:
 
   GLuint m_id;
 private:
-  BMPR::BmpFile bmpfile;
+  Image* m_bmp;
 };
 
 #endif

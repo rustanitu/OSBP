@@ -36,7 +36,7 @@
     <ClCompile Include="ShaderTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\include\Image\BmpReader.cpp">
+    <ClCompile Include="..\include\Image\image.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -70,7 +70,7 @@
     <ClInclude Include="ShaderTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Image\BmpReader.h">
+    <ClInclude Include="..\include\Image\image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

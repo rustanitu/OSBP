@@ -8,7 +8,7 @@ Sphere::Sphere(float radius, int nslices, int nstacks)
 {
   int i, j;
   float theta, phi, tx_theta, tx_phi;
-  float x, y, z, s, t;
+  float x, y, z;
 
   tx_theta = (2 * PI) / nslices;
   tx_phi = (PI) / nstacks;
@@ -24,13 +24,11 @@ Sphere::Sphere(float radius, int nslices, int nstacks)
       x = radius*cos(theta)*sin(phi);
       y = radius*cos(phi);
       z = radius*sin(theta)*sin(phi);
-      s = (PI - theta) / PI;
-      t = (phi / 2 * PI);
       grid[i][j][0] = x;
       grid[i][j][1] = y;
       grid[i][j][2] = z;
-      grid[i][j][3] = 0.37f;
-      grid[i][j][4] = 0.73f;
+      grid[i][j][3] = j / (float)nslices;
+      grid[i][j][4] = i / (float)nstacks;
     }
   }
 
@@ -126,11 +124,19 @@ void Sphere::Draw()
 
 void Sphere::DrawWire()
 {
-  glVertexAttribPointer(m_attributes["vertex"], 3, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(m_attributes["vertex"]);
+  glBindVertexArray(m_vao);
 
-  glVertexAttribPointer(m_attributes["normal"], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glBindBuffer(m_bufferTypes["vertex"], m_buffers["vertex"]);
+  glEnableVertexAttribArray(m_attributes["vertex"]);
+  glVertexAttribPointer(m_attributes["vertex"], 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+  glBindBuffer(m_bufferTypes["normal"], m_buffers["normal"]);
   glEnableVertexAttribArray(m_attributes["normal"]);
+  glVertexAttribPointer(m_attributes["normal"], 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+  glBindBuffer(m_bufferTypes["texcoord"], m_buffers["texcoord"]);
+  glEnableVertexAttribArray(m_attributes["texcoord"]);
+  glVertexAttribPointer(m_attributes["texcoord"], 2, GL_FLOAT, GL_FALSE, 0, 0);
 
   glDrawArrays(GL_LINES, 0, m_size);
 }

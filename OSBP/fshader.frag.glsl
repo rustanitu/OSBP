@@ -30,5 +30,5 @@ void main()
    
    // Final Color
    color = amb + cdiff + cspec;
-   color *= texture( difftexture, st ).rgb;
+   color = texture2D(difftexture, st).rgb;
 } 
