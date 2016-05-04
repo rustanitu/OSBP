@@ -13,14 +13,16 @@ public:
   ~Sphere();
 
   void TransferData();
+  void ConnectBuffer();
   void InitDraw() {}
 	void Draw();
-	void DrawWire();
   void EndDraw() {}
 
 private:
 	float *m_vertices;
   float *m_texcoord;
+  float *m_tangents;
+  float *m_bitangents;
 	int m_size;
 
 };

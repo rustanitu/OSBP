@@ -67,7 +67,7 @@ static void motion (int x, int y)
 			glm::vec3 v0 = map(g_x0, g_y0);
 			glm::vec3 v1 = map(x, y);
 			glm::vec3 r = glm::cross(v0, v1);
-			VManipulator::getCurrent()->rotate(TORAD(2*asin(glm::length(r))),r.x,r.y,r.z);
+			VManipulator::getCurrent()->rotate(0.1f * TORAD(2*asin(glm::length(r))),r.x,r.y,r.z);
 		}
 		else if (g_state == 's') {
 			int vp[4];

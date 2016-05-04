@@ -19,6 +19,8 @@ Sphere sphere;
 GLuint vao, vbo[1];
 VManipulator* manip = NULL;
 ShaderTexture tex;
+ShaderTexture texnormals;
+glm::mat4 model;
 
 
 // Initialization function
@@ -33,7 +35,7 @@ static void Init()
   }
 
   // init OpenGL state
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glEnable(GL_DEPTH_TEST);
 
   shader = new ShaderProgram();
@@ -44,16 +46,19 @@ static void Init()
   sphere.SetAttribute("vertex", 0, GL_ARRAY_BUFFER);
   sphere.SetAttribute("normal", 1, GL_ARRAY_BUFFER);
   sphere.SetAttribute("texcoord", 2, GL_ARRAY_BUFFER);
+  sphere.SetAttribute("tan", 3, GL_ARRAY_BUFFER);
+  sphere.SetAttribute("binorm", 4, GL_ARRAY_BUFFER);
   sphere.TransferData();
-  tex.Init("world.bmp");
+  tex.Init("moon.bmp");
+  texnormals.Init("moonnorm.bmp");
 
   shader->LinkProgram();
 
   cam = new Camera(W, H);
-  cam->SetEye(0, 0, 2);
+  cam->SetEye(0, 0, 2.4);
   cam->SetupCamera();
 
-  manip = new VManipulator(&cam->m_view);
+  manip = new VManipulator(&model);
 }
 
 // Reshape callback5
@@ -70,22 +75,24 @@ static void DrawScene()
   glClear(GL_COLOR_BUFFER_BIT);
   shader->UseProgram();
 
-  glm::mat4 mvp = cam->m_proj * cam->m_view;
+  glm::mat4 mvp = cam->m_proj * cam->m_view * model;
   shader->SetUniform("mvp", mvp);
-  shader->SetUniform("model", glm::mat4());
-  shader->SetUniform("tinv_model", glm::transpose(glm::inverse(glm::mat4())));
+  shader->SetUniform("model", model);
+  shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
 
-  shader->SetUniform("light", cam->GetEye());
+  shader->SetUniform("light", cam->GetEye()); //glm::vec3(2, 2, 3));
   shader->SetUniform("eye", cam->GetEye());
 
-  glm::vec3 blue = glm::vec3(0.1, 0.1, 0.4);
-  shader->SetUniform("amb", blue * 0.8f);
-  shader->SetUniform("diff", glm::vec3(0.9, 0.9, 0.4) * 0.5f);
-  shader->SetUniform("spec", glm::vec3(0.1, 0.1, 0.1) * 8.0f);
-  shader->SetUniform("shi", 100.0f);
+  glm::vec3 white = glm::vec3(1, 1, 1);
+  shader->SetUniform("amb", white * 0.0f);
+  shader->SetUniform("diff", white * 0.5f);
+  shader->SetUniform("spec", white * 0.5f);
+  shader->SetUniform("shi", 20.0f);
 
-  shader->SetUniform("difftexture", (GLuint)0);
+  shader->SetUniform("normtexture", texnormals.m_id);
+  shader->SetUniform("difftexture", tex.m_id);
 
+  texnormals.LoadTexture();
   tex.LoadTexture();
   sphere.Draw();
 }

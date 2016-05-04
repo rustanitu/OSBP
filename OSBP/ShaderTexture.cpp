@@ -21,7 +21,7 @@ void ShaderTexture::Init(char* file)
 void ShaderTexture::LoadTexture()
 {
   glEnable(GL_TEXTURE_2D);
-  glActiveTexture(GL_TEXTURE0);
+  glActiveTexture(GL_TEXTURE0 + m_id);
   glBindTexture(GL_TEXTURE_2D, m_id);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgGetWidth(m_bmp), imgGetHeight(m_bmp), 0, GL_RGB, GL_FLOAT, imgGetData(m_bmp));
 
