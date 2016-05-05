@@ -42,6 +42,7 @@ static void Init()
   shader->Init();
   shader->CreateShader("vshader.vert.glsl", GL_VERTEX_SHADER);
   shader->CreateShader("fshader.frag.glsl", GL_FRAGMENT_SHADER);
+
   sphere.Init(shader);
   sphere.SetAttribute("vertex", 0, GL_ARRAY_BUFFER);
   sphere.SetAttribute("normal", 1, GL_ARRAY_BUFFER);
@@ -49,8 +50,9 @@ static void Init()
   sphere.SetAttribute("tan", 3, GL_ARRAY_BUFFER);
   sphere.SetAttribute("binorm", 4, GL_ARRAY_BUFFER);
   sphere.TransferData();
-  tex.Init("moon.bmp");
-  texnormals.Init("moonnorm.bmp");
+
+  tex.Init("textures\\moon.bmp");
+  texnormals.Init("textures\\moonnorm.bmp");
 
   shader->LinkProgram();
 
@@ -61,7 +63,7 @@ static void Init()
   manip = new VManipulator(&model);
 }
 
-// Reshape callback5
+// Reshape callback
 static void Reshape(int w, int h)
 {
   glViewport(0, 0, w, h);
@@ -80,14 +82,15 @@ static void DrawScene()
   shader->SetUniform("model", model);
   shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
 
-  shader->SetUniform("light", cam->GetEye()); //glm::vec3(2, 2, 3));
+  shader->SetUniform("light", cam->GetEye() + glm::vec3(0, 0, 1000));
   shader->SetUniform("eye", cam->GetEye());
 
   glm::vec3 white = glm::vec3(1, 1, 1);
+  glm::vec3 blue = glm::vec3(0.1, 0.1, 0.4);
   shader->SetUniform("amb", white * 0.0f);
-  shader->SetUniform("diff", white * 0.5f);
-  shader->SetUniform("spec", white * 0.5f);
-  shader->SetUniform("shi", 20.0f);
+  shader->SetUniform("diff", white * 0.0f);
+  shader->SetUniform("spec", white * 0.3f);
+  shader->SetUniform("shi", 1.0f);
 
   shader->SetUniform("normtexture", texnormals.m_id);
   shader->SetUniform("difftexture", tex.m_id);

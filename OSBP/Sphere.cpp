@@ -8,7 +8,7 @@
 
 struct VertexInfo
 {
-  glm::vec3 v;
+  glm::vec3 pos;
   glm::vec2 st;
   glm::vec3 tan;
   glm::vec3 binorm;
@@ -38,17 +38,17 @@ Sphere::Sphere(float r, int nslices, int nstacks)
       float y = r*cosphi;
       float z = r*sintheta*sinphi;
 
-      float dxs = -2*PI*r*sinphi*sintheta;
+      float dxs = - 2*PI*PI*r*sintheta*sinphi;
       float dys = 0.0f;
-      float dzs = 2*PI*r*sinphi*costheta;
+      float dzs = 2*PI*PI*r*costheta*sinphi;
 
-      float dxt = PI*r*costheta*cosphi;
-      float dyt = -PI*r*sinphi;
-      float dzt = -PI*r*sintheta*cosphi;
+      float dxt = PI*PI*r*costheta*cosphi;
+      float dyt = -PI*PI*r*sinphi;
+      float dzt = PI*PI*r*sintheta*cosphi;
 
       float s = j / (float)nslices;
       float t = i / (float)nstacks;
-      grid[i][j].v = glm::vec3(x, y, z);
+      grid[i][j].pos = glm::vec3(x, y, z);
       grid[i][j].st = glm::vec2(s, t);
       grid[i][j].tan = glm::vec3(dxs, dys, dzs);
       grid[i][j].binorm = glm::vec3(dxt, dyt, dzt);
@@ -65,73 +65,73 @@ Sphere::Sphere(float r, int nslices, int nstacks)
   {
     for (j = 0; j < nstacks; j++)
     {
-      m_vertices[v] = grid[j][i].v.x;
+      m_vertices[v] = grid[j][i].pos.x;
       m_tangents[v] = grid[j][i].tan.x;
       m_bitangents[v++] = grid[j][i].binorm.x;
-      m_vertices[v] = grid[j][i].v.y;
+      m_vertices[v] = grid[j][i].pos.y;
       m_tangents[v] = grid[j][i].tan.y;
       m_bitangents[v++] = grid[j][i].binorm.y;
-      m_vertices[v] = grid[j][i].v.z;
+      m_vertices[v] = grid[j][i].pos.z;
       m_tangents[v] = grid[j][i].tan.z;
       m_bitangents[v++] = grid[j][i].binorm.z;
       m_texcoord[c++] = grid[j][i].st.s;
       m_texcoord[c++] = grid[j][i].st.t;
 
-      m_vertices[v] = grid[j][i + 1].v.x;
+      m_vertices[v] = grid[j][i + 1].pos.x;
       m_tangents[v] = grid[j][i + 1].tan.x;
       m_bitangents[v++] = grid[j][i + 1].binorm.x;
-      m_vertices[v] = grid[j][i + 1].v.y;
+      m_vertices[v] = grid[j][i + 1].pos.y;
       m_tangents[v] = grid[j][i + 1].tan.y;
       m_bitangents[v++] = grid[j][i + 1].binorm.y;
-      m_vertices[v] = grid[j][i + 1].v.z;
+      m_vertices[v] = grid[j][i + 1].pos.z;
       m_tangents[v] = grid[j][i + 1].tan.z;
       m_bitangents[v++] = grid[j][i + 1].binorm.z;
       m_texcoord[c++] = grid[j][i + 1].st.s;
       m_texcoord[c++] = grid[j][i + 1].st.t;
 
-      m_vertices[v] = grid[j + 1][i].v.x;
+      m_vertices[v] = grid[j + 1][i].pos.x;
       m_tangents[v] = grid[j + 1][i].tan.x;
       m_bitangents[v++] = grid[j + 1][i].binorm.x;
-      m_vertices[v] = grid[j + 1][i].v.y;
+      m_vertices[v] = grid[j + 1][i].pos.y;
       m_tangents[v] = grid[j + 1][i].tan.y;
       m_bitangents[v++] = grid[j + 1][i].binorm.y;
-      m_vertices[v] = grid[j + 1][i].v.z;
+      m_vertices[v] = grid[j + 1][i].pos.z;
       m_tangents[v] = grid[j + 1][i].tan.z;
       m_bitangents[v++] = grid[j + 1][i].binorm.z;
       m_texcoord[c++] = grid[j + 1][i].st.s;
       m_texcoord[c++] = grid[j + 1][i].st.t;
 
-      m_vertices[v] = grid[j + 1][i].v.x;
+      m_vertices[v] = grid[j + 1][i].pos.x;
       m_tangents[v] = grid[j + 1][i].tan.x;
       m_bitangents[v++] = grid[j + 1][i].binorm.x;
-      m_vertices[v] = grid[j + 1][i].v.y;
+      m_vertices[v] = grid[j + 1][i].pos.y;
       m_tangents[v] = grid[j + 1][i].tan.y;
       m_bitangents[v++] = grid[j + 1][i].binorm.y;
-      m_vertices[v] = grid[j + 1][i].v.z;
+      m_vertices[v] = grid[j + 1][i].pos.z;
       m_tangents[v] = grid[j + 1][i].tan.z;
       m_bitangents[v++] = grid[j + 1][i].binorm.z;
       m_texcoord[c++] = grid[j + 1][i].st.s;
       m_texcoord[c++] = grid[j + 1][i].st.t;
 
-      m_vertices[v] = grid[j][i + 1].v.x;
+      m_vertices[v] = grid[j][i + 1].pos.x;
       m_tangents[v] = grid[j][i + 1].tan.x;
       m_bitangents[v++] = grid[j][i + 1].binorm.x;
-      m_vertices[v] = grid[j][i + 1].v.y;
+      m_vertices[v] = grid[j][i + 1].pos.y;
       m_tangents[v] = grid[j][i + 1].tan.y;
       m_bitangents[v++] = grid[j][i + 1].binorm.y;
-      m_vertices[v] = grid[j][i + 1].v.z;
+      m_vertices[v] = grid[j][i + 1].pos.z;
       m_tangents[v] = grid[j][i + 1].tan.z;
       m_bitangents[v++] = grid[j][i + 1].binorm.z;
       m_texcoord[c++] = grid[j][i + 1].st.s;
       m_texcoord[c++] = grid[j][i + 1].st.t;
 
-      m_vertices[v] = grid[j + 1][i + 1].v.x;
+      m_vertices[v] = grid[j + 1][i + 1].pos.x;
       m_tangents[v] = grid[j + 1][i + 1].tan.x;
       m_bitangents[v++] = grid[j + 1][i + 1].binorm.x;
-      m_vertices[v] = grid[j + 1][i + 1].v.y;
+      m_vertices[v] = grid[j + 1][i + 1].pos.y;
       m_tangents[v] = grid[j + 1][i + 1].tan.y;
       m_bitangents[v++] = grid[j + 1][i + 1].binorm.y;
-      m_vertices[v] = grid[j + 1][i + 1].v.z;
+      m_vertices[v] = grid[j + 1][i + 1].pos.z;
       m_tangents[v] = grid[j + 1][i + 1].tan.z;
       m_bitangents[v++] = grid[j + 1][i + 1].binorm.z;
       m_texcoord[c++] = grid[j + 1][i + 1].st.s;
@@ -139,7 +139,10 @@ Sphere::Sphere(float r, int nslices, int nstacks)
     }
   }
 
-  delete grid;
+  for (i = 0; i <= nstacks; i++)
+    delete[] grid[i];
+
+  delete[] grid;
 }
 
 Sphere::~Sphere()
@@ -198,6 +201,5 @@ void Sphere::ConnectBuffer()
 void Sphere::Draw()
 {
   ConnectBuffer();
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glDrawArrays(GL_TRIANGLES, 0, m_size);
 }

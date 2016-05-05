@@ -10,6 +10,8 @@ ShaderTexture::ShaderTexture() : m_bmp(NULL)
 
 ShaderTexture::~ShaderTexture()
 {
+  glDeleteTextures(1, &m_id);
+  imgDestroy(m_bmp);
 }
 
 void ShaderTexture::Init(char* file)
@@ -27,5 +29,5 @@ void ShaderTexture::LoadTexture()
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  //glGenerateMipmap(GL_TEXTURE_2D);
+  glGenerateMipmap(GL_TEXTURE_2D);
 }
