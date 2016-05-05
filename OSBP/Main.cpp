@@ -33,6 +33,8 @@ static void Init()
     fprintf(stderr, "GLEW Error: %s\n", glewGetErrorString(err));
     exit(!1);
   }
+  glutInitContextVersion(4, 5);
+  glutInitContextProfile(GLUT_CORE_PROFILE);
 
   // init OpenGL state
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -82,15 +84,14 @@ static void DrawScene()
   shader->SetUniform("model", model);
   shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
 
-  shader->SetUniform("light", cam->GetEye() + glm::vec3(0, 0, 1000));
+  shader->SetUniform("light", glm::vec3(-5, 0, 0));
   shader->SetUniform("eye", cam->GetEye());
 
   glm::vec3 white = glm::vec3(1, 1, 1);
-  glm::vec3 blue = glm::vec3(0.1, 0.1, 0.4);
-  shader->SetUniform("amb", white * 0.0f);
-  shader->SetUniform("diff", white * 0.0f);
-  shader->SetUniform("spec", white * 0.3f);
-  shader->SetUniform("shi", 1.0f);
+  shader->SetUniform("amb", white * 0.1f);
+  shader->SetUniform("diff", white * 1.0f);
+  shader->SetUniform("spec", white * 0.25f);
+  shader->SetUniform("shi", 10.0f);
 
   shader->SetUniform("normtexture", texnormals.m_id);
   shader->SetUniform("difftexture", tex.m_id);

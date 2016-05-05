@@ -41,6 +41,5 @@ void main()
   }
   
   // Final Color
-  //color = amb + cdiff + cspec;
-  color = amb + texture(difftexture, st).rgb + cspec;
+  color = amb + mix(cdiff, texture(difftexture, st).rgb, 0.25) + cspec;
 } 
