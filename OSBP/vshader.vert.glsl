@@ -21,6 +21,6 @@ void main()
   wrl_position = mat3(model) * vertex;
   wrl_normal = mat3(tinv_model) * normal;
   st = texcoord;
-  tangent = mat3(tinv_model) * tan;
-  binormal = mat3(tinv_model) * binorm;
+  tangent = mat3(tinv_model) * normalize(tan);
+  binormal = mat3(tinv_model) * normalize(binorm);
 } 

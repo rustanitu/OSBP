@@ -84,7 +84,7 @@ static void DrawScene()
   shader->SetUniform("model", model);
   shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
 
-  shader->SetUniform("light", glm::vec3(-5, 0, 0));
+  shader->SetUniform("light", cam->GetEye() + glm::vec3(0, 2, 0));
   shader->SetUniform("eye", cam->GetEye());
 
   glm::vec3 white = glm::vec3(1, 1, 1);

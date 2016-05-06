@@ -2,6 +2,7 @@
 
 #include <glm\vec2.hpp>
 #include <glm\vec3.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 #include <math.h>
 
 #define PI 3.14159265359
@@ -24,13 +25,13 @@ Sphere::Sphere(float r, int nslices, int nstacks)
   VertexInfo** grid = new VertexInfo*[nstacks + 1];
   for (i = 0; i <= nstacks; i++)
   {
-    float phi = tx_phi*i; // => Pi*t
+    float phi = tx_phi*i;
     float sinphi = sin(phi);
     float cosphi = cos(phi);
     grid[i] = new VertexInfo[nslices + 1];
     for (j = 0; j <= nslices; j++)
     {
-      float theta = (j < nslices) ? tx_theta*j : 0.0f; // => 2*PI*s
+      float theta = (j < nslices) ? tx_theta*j : 0.0f;
       float sintheta = sin(theta);
       float costheta = cos(theta);
 
@@ -38,20 +39,21 @@ Sphere::Sphere(float r, int nslices, int nstacks)
       float y = r*cosphi;
       float z = r*sintheta*sinphi;
 
-      float dxs = - 2*PI*PI*r*sintheta*sinphi;
-      float dys = 0.0f;
-      float dzs = 2*PI*PI*r*costheta*sinphi;
-
-      float dxt = PI*PI*r*costheta*cosphi;
-      float dyt = -PI*PI*r*sinphi;
-      float dzt = PI*PI*r*sintheta*cosphi;
-
       float s = j / (float)nslices;
       float t = i / (float)nstacks;
       grid[i][j].pos = glm::vec3(x, y, z);
       grid[i][j].st = glm::vec2(s, t);
-      grid[i][j].tan = glm::vec3(dxs, dys, dzs);
-      grid[i][j].binorm = glm::vec3(dxt, dyt, dzt);
+    }
+  }
+
+  for (int i = 0; i <= nslices; i++)
+  {
+    int ni = (i + 1) % (nslices + 1);
+    for (int j = 0; j <= nstacks; j++)
+    {
+      int nj = (j + 1) % (nstacks + 1);
+      SetTangentVectors(grid[j][i], grid[j][ni], grid[nj][i]);
+      SetTangentVectors(grid[nj][i], grid[j][ni], grid[nj][ni]);
     }
   }
 
@@ -149,6 +151,36 @@ Sphere::~Sphere()
 {
   delete[] m_vertices;
   delete[] m_texcoord;
+}
+
+void Sphere::SetTangentVectors(VertexInfo& v0, VertexInfo& v1, VertexInfo& v2)
+{
+  glm::vec3 xst0(v0.pos.x, v0.st.s, v0.st.t);
+  glm::vec3 xst1(v1.pos.x, v1.st.s, v1.st.t);
+  glm::vec3 xst2(v2.pos.x, v2.st.s, v2.st.t);
+  glm::vec3 ABCD0 = glm::cross(xst1 - xst0, xst2 - xst0);
+
+  glm::vec3 yst0(v0.pos.y, v0.st.s, v0.st.t);
+  glm::vec3 yst1(v1.pos.y, v1.st.s, v1.st.t);
+  glm::vec3 yst2(v2.pos.y, v2.st.s, v2.st.t);
+  glm::vec3 ABCD1 = glm::cross(yst1 - yst0, yst2 - yst0);
+
+  glm::vec3 zst0(v0.pos.z, v0.st.s, v0.st.t);
+  glm::vec3 zst1(v1.pos.z, v1.st.s, v1.st.t);
+  glm::vec3 zst2(v2.pos.z, v2.st.s, v2.st.t);
+  glm::vec3 ABCD2 = glm::cross(zst1 - zst0, zst2 - zst0);
+
+  glm::vec3 tan = glm::vec3(-ABCD0.y / ABCD0.x, -ABCD1.y / ABCD1.x, -ABCD2.y / ABCD2.x);
+  glm::vec3 binorm = glm::vec3(-ABCD0.z / ABCD0.x, -ABCD1.z / ABCD1.x, -ABCD2.z / ABCD2.x);
+
+  v0.tan += tan;
+  v0.binorm += binorm;
+
+  v1.tan += tan;
+  v1.binorm += binorm;
+
+  v2.tan += tan;
+  v2.binorm += binorm;
 }
 
 // draw sphere
