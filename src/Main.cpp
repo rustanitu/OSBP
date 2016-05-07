@@ -42,8 +42,8 @@ static void Init()
 
   shader = new ShaderProgram();
   shader->Init();
-  shader->CreateShader("vshader.vert.glsl", GL_VERTEX_SHADER);
-  shader->CreateShader("fshader.frag.glsl", GL_FRAGMENT_SHADER);
+  shader->CreateShader("shaders\\vshader.vert.glsl", GL_VERTEX_SHADER);
+  shader->CreateShader("shaders\\fshader.frag.glsl", GL_FRAGMENT_SHADER);
 
   sphere.Init(shader);
   sphere.SetAttribute("vertex", 0, GL_ARRAY_BUFFER);
@@ -53,8 +53,8 @@ static void Init()
   sphere.SetAttribute("binorm", 4, GL_ARRAY_BUFFER);
   sphere.TransferData();
 
-  tex.Init("textures\\moon.bmp");
-  texnormals.Init("textures\\moonnorm.bmp");
+  tex.Init("..\\textures\\moon.bmp");
+  texnormals.Init("..\\textures\\moonnorm.bmp");
 
   shader->LinkProgram();
 

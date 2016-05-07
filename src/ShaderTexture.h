@@ -2,7 +2,7 @@
 #define SHADER_TEXTURE_H
 
 extern "C" {
-#include <Image\image.h>
+#include "image\Image.h"
 }
 #include <GL\glew.h>
 

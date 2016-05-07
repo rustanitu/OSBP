@@ -15,63 +15,59 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ShaderProgram.cpp">
+    <ClCompile Include="..\src\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="..\src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="..\src\Manipulator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sphere.cpp">
+    <ClCompile Include="..\src\ShaderObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Manipulator.cpp">
+    <ClCompile Include="..\src\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderObject.cpp">
+    <ClCompile Include="..\src\ShaderTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderTexture.cpp">
+    <ClCompile Include="..\src\Sphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\include\Image\image.c">
+    <ClCompile Include="..\src\Image\Image.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vshader.vert.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="fshader.frag.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
+    <ClInclude Include="..\src\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Manipulator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ShaderObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ShaderTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Triangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Image\Image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ShaderProgram.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Triangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manipulator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Image\image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <None Include="..\src\fshader.frag.glsl" />
+    <None Include="..\src\vshader.vert.glsl" />
   </ItemGroup>
 </Project>
