@@ -24,6 +24,11 @@ public:
     return m_eye;
   }
 
+  float GetNear()
+  {
+    return m_near;
+  }
+
   // Camera Trsnformations
   void Translate(float tx, float ty, float tz);
   void Translate(glm::vec3 t);

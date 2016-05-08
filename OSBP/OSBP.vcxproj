@@ -39,8 +39,8 @@
     <ClInclude Include="..\src\Triangle.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\fshader.frag.glsl" />
-    <None Include="..\src\vshader.vert.glsl" />
+    <None Include="..\src\shaders\fshader.frag.glsl" />
+    <None Include="..\src\shaders\vshader.vert.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D236B4EC-C054-4873-AAAB-5F8C1D60E6D8}</ProjectGuid>

@@ -17,10 +17,9 @@ ShaderProgram* shader = NULL;
 Camera* cam = NULL;
 Sphere sphere;
 GLuint vao, vbo[1];
-VManipulator* manip = NULL;
+Manipulator* manip = NULL;
 ShaderTexture tex;
 ShaderTexture texnormals;
-glm::mat4 model;
 
 
 // Initialization function
@@ -59,10 +58,11 @@ static void Init()
   shader->LinkProgram();
 
   cam = new Camera(W, H);
-  cam->SetEye(0, 0, 2.4);
+  cam->SetEye(0, 0, 3);
   cam->SetupCamera();
 
-  manip = new VManipulator(&model);
+  sphere.SetManipulatorCamera(cam);
+  Manipulator::SetCurrent(sphere.GetManipulator());
 }
 
 // Reshape callback
@@ -79,12 +79,13 @@ static void DrawScene()
   glClear(GL_COLOR_BUFFER_BIT);
   shader->UseProgram();
 
+  glm::mat4 model = sphere.GetModel();
   glm::mat4 mvp = cam->m_proj * cam->m_view * model;
   shader->SetUniform("mvp", mvp);
   shader->SetUniform("model", model);
   shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
 
-  shader->SetUniform("light", cam->GetEye() + glm::vec3(0, 2, 0));
+  shader->SetUniform("light", cam->GetEye() + glm::vec3(0, 0, 10));
   shader->SetUniform("eye", cam->GetEye());
 
   glm::vec3 white = glm::vec3(1, 1, 1);

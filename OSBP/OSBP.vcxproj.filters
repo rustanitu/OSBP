@@ -67,7 +67,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\fshader.frag.glsl" />
-    <None Include="..\src\vshader.vert.glsl" />
+    <None Include="..\src\shaders\fshader.frag.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\src\shaders\vshader.vert.glsl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

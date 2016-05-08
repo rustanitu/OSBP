@@ -6,28 +6,43 @@
 #ifndef V_MANIPULATOR_H
 #define V_MANIPULATOR_H
 
+#include <glm\vec3.hpp>
 #include <glm\mat4x4.hpp>
 
-class VManipulator
+#include "Camera.h"
+
+class Manipulator
 {
 private:
+	static Manipulator* s_current;
+  Camera* m_cam;
 	glm::mat4* m_matrix;
-	float m_zcenter;
-	VManipulator* m_next;
-	static VManipulator* s_current;
 
 public:
-	static VManipulator* getCurrent ();
-	static void setCurrent (VManipulator* manipulator);
 
-	VManipulator(glm::mat4* matrix);
-	void setZCenter (float zcenter);
-	void centralize ();
-	void decentralize ();
-	void rotate (float angle, float rx, float ry, float rz);
-	void scale (float sx, float sy, float sz);
-	float getYRotation ();
+	static Manipulator* GetCurrent ();
+	static void SetCurrent (Manipulator* manipulator);
 
+  Manipulator(glm::mat4* matrix);
+	void Rotate (float angle, float rx, float ry, float rz);
+	void Scale (float sx, float sy, float sz);
+
+  glm::vec3 GetTargetPosition();
+
+  void SetCamera(Camera* cam)
+  {
+    m_cam = cam;
+  }
+
+  Camera* GetCamera()
+  {
+    return m_cam;
+  }
+
+  glm::mat4 GetTargetBase()
+  {
+    return *m_matrix;
+  }
 };
 
 #endif
