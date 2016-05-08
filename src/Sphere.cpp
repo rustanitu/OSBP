@@ -12,7 +12,7 @@ struct VertexInfo
   glm::vec3 pos;
   glm::vec2 st;
   glm::vec3 tan;
-  glm::vec3 binorm;
+  glm::vec3 bitan;
 };
 
 Sphere::Sphere(float r, int nslices, int nstacks)
@@ -69,73 +69,73 @@ Sphere::Sphere(float r, int nslices, int nstacks)
     {
       m_vertices[v] = grid[j][i].pos.x;
       m_tangents[v] = grid[j][i].tan.x;
-      m_bitangents[v++] = grid[j][i].binorm.x;
+      m_bitangents[v++] = grid[j][i].bitan.x;
       m_vertices[v] = grid[j][i].pos.y;
       m_tangents[v] = grid[j][i].tan.y;
-      m_bitangents[v++] = grid[j][i].binorm.y;
+      m_bitangents[v++] = grid[j][i].bitan.y;
       m_vertices[v] = grid[j][i].pos.z;
       m_tangents[v] = grid[j][i].tan.z;
-      m_bitangents[v++] = grid[j][i].binorm.z;
+      m_bitangents[v++] = grid[j][i].bitan.z;
       m_texcoord[c++] = grid[j][i].st.s;
       m_texcoord[c++] = grid[j][i].st.t;
 
       m_vertices[v] = grid[j][i + 1].pos.x;
       m_tangents[v] = grid[j][i + 1].tan.x;
-      m_bitangents[v++] = grid[j][i + 1].binorm.x;
+      m_bitangents[v++] = grid[j][i + 1].bitan.x;
       m_vertices[v] = grid[j][i + 1].pos.y;
       m_tangents[v] = grid[j][i + 1].tan.y;
-      m_bitangents[v++] = grid[j][i + 1].binorm.y;
+      m_bitangents[v++] = grid[j][i + 1].bitan.y;
       m_vertices[v] = grid[j][i + 1].pos.z;
       m_tangents[v] = grid[j][i + 1].tan.z;
-      m_bitangents[v++] = grid[j][i + 1].binorm.z;
+      m_bitangents[v++] = grid[j][i + 1].bitan.z;
       m_texcoord[c++] = grid[j][i + 1].st.s;
       m_texcoord[c++] = grid[j][i + 1].st.t;
 
       m_vertices[v] = grid[j + 1][i].pos.x;
       m_tangents[v] = grid[j + 1][i].tan.x;
-      m_bitangents[v++] = grid[j + 1][i].binorm.x;
+      m_bitangents[v++] = grid[j + 1][i].bitan.x;
       m_vertices[v] = grid[j + 1][i].pos.y;
       m_tangents[v] = grid[j + 1][i].tan.y;
-      m_bitangents[v++] = grid[j + 1][i].binorm.y;
+      m_bitangents[v++] = grid[j + 1][i].bitan.y;
       m_vertices[v] = grid[j + 1][i].pos.z;
       m_tangents[v] = grid[j + 1][i].tan.z;
-      m_bitangents[v++] = grid[j + 1][i].binorm.z;
+      m_bitangents[v++] = grid[j + 1][i].bitan.z;
       m_texcoord[c++] = grid[j + 1][i].st.s;
       m_texcoord[c++] = grid[j + 1][i].st.t;
 
       m_vertices[v] = grid[j + 1][i].pos.x;
       m_tangents[v] = grid[j + 1][i].tan.x;
-      m_bitangents[v++] = grid[j + 1][i].binorm.x;
+      m_bitangents[v++] = grid[j + 1][i].bitan.x;
       m_vertices[v] = grid[j + 1][i].pos.y;
       m_tangents[v] = grid[j + 1][i].tan.y;
-      m_bitangents[v++] = grid[j + 1][i].binorm.y;
+      m_bitangents[v++] = grid[j + 1][i].bitan.y;
       m_vertices[v] = grid[j + 1][i].pos.z;
       m_tangents[v] = grid[j + 1][i].tan.z;
-      m_bitangents[v++] = grid[j + 1][i].binorm.z;
+      m_bitangents[v++] = grid[j + 1][i].bitan.z;
       m_texcoord[c++] = grid[j + 1][i].st.s;
       m_texcoord[c++] = grid[j + 1][i].st.t;
 
       m_vertices[v] = grid[j][i + 1].pos.x;
       m_tangents[v] = grid[j][i + 1].tan.x;
-      m_bitangents[v++] = grid[j][i + 1].binorm.x;
+      m_bitangents[v++] = grid[j][i + 1].bitan.x;
       m_vertices[v] = grid[j][i + 1].pos.y;
       m_tangents[v] = grid[j][i + 1].tan.y;
-      m_bitangents[v++] = grid[j][i + 1].binorm.y;
+      m_bitangents[v++] = grid[j][i + 1].bitan.y;
       m_vertices[v] = grid[j][i + 1].pos.z;
       m_tangents[v] = grid[j][i + 1].tan.z;
-      m_bitangents[v++] = grid[j][i + 1].binorm.z;
+      m_bitangents[v++] = grid[j][i + 1].bitan.z;
       m_texcoord[c++] = grid[j][i + 1].st.s;
       m_texcoord[c++] = grid[j][i + 1].st.t;
 
       m_vertices[v] = grid[j + 1][i + 1].pos.x;
       m_tangents[v] = grid[j + 1][i + 1].tan.x;
-      m_bitangents[v++] = grid[j + 1][i + 1].binorm.x;
+      m_bitangents[v++] = grid[j + 1][i + 1].bitan.x;
       m_vertices[v] = grid[j + 1][i + 1].pos.y;
       m_tangents[v] = grid[j + 1][i + 1].tan.y;
-      m_bitangents[v++] = grid[j + 1][i + 1].binorm.y;
+      m_bitangents[v++] = grid[j + 1][i + 1].bitan.y;
       m_vertices[v] = grid[j + 1][i + 1].pos.z;
       m_tangents[v] = grid[j + 1][i + 1].tan.z;
-      m_bitangents[v++] = grid[j + 1][i + 1].binorm.z;
+      m_bitangents[v++] = grid[j + 1][i + 1].bitan.z;
       m_texcoord[c++] = grid[j + 1][i + 1].st.s;
       m_texcoord[c++] = grid[j + 1][i + 1].st.t;
     }
@@ -171,16 +171,45 @@ void Sphere::SetTangentVectors(VertexInfo& v0, VertexInfo& v1, VertexInfo& v2)
   glm::vec3 ABCD2 = glm::cross(zst1 - zst0, zst2 - zst0);
 
   glm::vec3 tan = glm::vec3(-ABCD0.y / ABCD0.x, -ABCD1.y / ABCD1.x, -ABCD2.y / ABCD2.x);
-  glm::vec3 binorm = glm::vec3(-ABCD0.z / ABCD0.x, -ABCD1.z / ABCD1.x, -ABCD2.z / ABCD2.x);
+  glm::vec3 bitan = glm::vec3(-ABCD0.z / ABCD0.x, -ABCD1.z / ABCD1.x, -ABCD2.z / ABCD2.x);
 
   v0.tan += tan;
-  v0.binorm += binorm;
+  v0.bitan += bitan;
 
   v1.tan += tan;
-  v1.binorm += binorm;
+  v1.bitan += bitan;
 
   v2.tan += tan;
-  v2.binorm += binorm;
+  v2.bitan += bitan;
+}
+
+void Sphere::SetVertexAttribute(std::string attname, GLuint location, GLenum bufferType)
+{
+  m_vertex = attname;
+  ShaderObject::SetAttribute(attname, location, bufferType);
+}
+
+void Sphere::SetNormalAttribute(std::string attname, GLuint location, GLenum bufferType)
+{
+  m_normal = attname;
+  ShaderObject::SetAttribute(attname, location, bufferType);
+}
+
+void Sphere::SetTextureAttribute(std::string attname, GLuint location, GLenum bufferType)
+{
+  m_texture = attname;
+  ShaderObject::SetAttribute(attname, location, bufferType);
+}
+
+void Sphere::SetTangentAttribute(std::string attname, GLuint location, GLenum bufferType)
+{
+  m_tangent = attname;
+  ShaderObject::SetAttribute(attname, location, bufferType);
+}
+void Sphere::SetBitangentAttribute(std::string attname, GLuint location, GLenum bufferType)
+{
+  m_bitangent = attname;
+  ShaderObject::SetAttribute(attname, location, bufferType);
 }
 
 // draw sphere
@@ -189,19 +218,19 @@ void Sphere::TransferData()
 {
   glBindVertexArray(m_vao);
 
-  glBindBuffer(m_bufferTypes["vertex"], m_buffers["vertex"]);
+  glBindBuffer(m_bufferTypes[m_vertex], m_buffers[m_vertex]);
   glBufferData(GL_ARRAY_BUFFER, 3 * m_size * sizeof(float), (void*)m_vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(m_bufferTypes["normal"], m_buffers["normal"]);
+  glBindBuffer(m_bufferTypes[m_normal], m_buffers[m_normal]);
   glBufferData(GL_ARRAY_BUFFER, 3 * m_size * sizeof(float), (void*)m_vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(m_bufferTypes["texcoord"], m_buffers["texcoord"]);
+  glBindBuffer(m_bufferTypes[m_texture], m_buffers[m_texture]);
   glBufferData(GL_ARRAY_BUFFER, 2 * m_size * sizeof(float), (void*)m_texcoord, GL_STATIC_DRAW);
 
-  glBindBuffer(m_bufferTypes["tan"], m_buffers["tan"]);
+  glBindBuffer(m_bufferTypes[m_tangent], m_buffers[m_tangent]);
   glBufferData(GL_ARRAY_BUFFER, 3 * m_size * sizeof(float), (void*)m_tangents, GL_STATIC_DRAW);
 
-  glBindBuffer(m_bufferTypes["binorm"], m_buffers["binorm"]);
+  glBindBuffer(m_bufferTypes[m_bitangent], m_buffers[m_bitangent]);
   glBufferData(GL_ARRAY_BUFFER, 3 * m_size * sizeof(float), (void*)m_bitangents, GL_STATIC_DRAW);
 }
 
@@ -209,25 +238,25 @@ void Sphere::ConnectBuffer()
 {
   glBindVertexArray(m_vao);
 
-  glBindBuffer(m_bufferTypes["vertex"], m_buffers["vertex"]);
-  glEnableVertexAttribArray(m_attributes["vertex"]);
-  glVertexAttribPointer(m_attributes["vertex"], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glBindBuffer(m_bufferTypes[m_vertex], m_buffers[m_vertex]);
+  glEnableVertexAttribArray(m_attributes[m_vertex]);
+  glVertexAttribPointer(m_attributes[m_vertex], 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  glBindBuffer(m_bufferTypes["normal"], m_buffers["normal"]);
-  glEnableVertexAttribArray(m_attributes["normal"]);
-  glVertexAttribPointer(m_attributes["normal"], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glBindBuffer(m_bufferTypes[m_normal], m_buffers[m_normal]);
+  glEnableVertexAttribArray(m_attributes[m_normal]);
+  glVertexAttribPointer(m_attributes[m_normal], 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  glBindBuffer(m_bufferTypes["texcoord"], m_buffers["texcoord"]);
-  glEnableVertexAttribArray(m_attributes["texcoord"]);
-  glVertexAttribPointer(m_attributes["texcoord"], 2, GL_FLOAT, GL_FALSE, 0, 0);
+  glBindBuffer(m_bufferTypes[m_texture], m_buffers[m_texture]);
+  glEnableVertexAttribArray(m_attributes[m_texture]);
+  glVertexAttribPointer(m_attributes[m_texture], 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-  glBindBuffer(m_bufferTypes["tan"], m_buffers["tan"]);
-  glEnableVertexAttribArray(m_attributes["tan"]);
-  glVertexAttribPointer(m_attributes["tan"], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glBindBuffer(m_bufferTypes[m_tangent], m_buffers[m_tangent]);
+  glEnableVertexAttribArray(m_attributes[m_tangent]);
+  glVertexAttribPointer(m_attributes[m_tangent], 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  glBindBuffer(m_bufferTypes["binorm"], m_buffers["binorm"]);
-  glEnableVertexAttribArray(m_attributes["binorm"]);
-  glVertexAttribPointer(m_attributes["binorm"], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glBindBuffer(m_bufferTypes[m_bitangent], m_buffers[m_bitangent]);
+  glEnableVertexAttribArray(m_attributes[m_bitangent]);
+  glVertexAttribPointer(m_attributes[m_bitangent], 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 void Sphere::Draw()

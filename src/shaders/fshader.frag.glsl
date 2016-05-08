@@ -4,7 +4,7 @@ in vec3 wrl_position;
 in vec3 wrl_normal;
 in vec2 st;
 in vec3 tangent;
-in vec3 binormal;
+in vec3 bitangent;
 
 uniform vec3 light; 
 uniform vec3 eye;
@@ -23,7 +23,7 @@ vec3 expand (vec3 v)
 out vec3 color;
 void main()
 {
-  mat3 rot = transpose(mat3(tangent, binormal, wrl_normal));
+  mat3 rot = transpose(mat3(tangent, bitangent, wrl_normal));
   vec3 wrl_vNormal = expand(texture(normtexture, st).rgb);
   vec3 wrl_vLight = normalize(rot * (light - wrl_position));
   vec3 wrl_vEye = normalize(rot * (eye - wrl_position));

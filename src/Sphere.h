@@ -22,11 +22,24 @@ public:
 	void Draw();
   void EndDraw() {}
 
+  void SetVertexAttribute(std::string attname, GLuint location, GLenum bufferType);
+  void SetNormalAttribute(std::string attname, GLuint location, GLenum bufferType);
+  void SetTextureAttribute(std::string attname, GLuint location, GLenum bufferType);
+  void SetTangentAttribute(std::string attname, GLuint location, GLenum bufferType);
+  void SetBitangentAttribute(std::string attname, GLuint location, GLenum bufferType);
+
 private:
 	float *m_vertices;
   float *m_texcoord;
   float *m_tangents;
   float *m_bitangents;
+
+  std::string m_vertex;
+  std::string m_normal;
+  std::string m_texture;
+  std::string m_tangent;
+  std::string m_bitangent;
+
 	int m_size;
 
 };

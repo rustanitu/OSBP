@@ -87,7 +87,7 @@ static void motion (int x, int y)
     {
 			int vp[4];
 			glGetIntegerv(GL_VIEWPORT,vp);
-      float f = dx > dy ? (float)(s_x0 - x) / vp[2] : (float)(y - s_y0) / vp[3];
+      float f = dx > dy ? (float)(x - s_x0) / vp[2] : (float)(s_y0 - y) / vp[3];
 			manip->Scale(1+f, 1+f, 1+f);
 		}
 		s_x0 = x; s_y0 = y;
