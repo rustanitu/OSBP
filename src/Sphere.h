@@ -29,10 +29,10 @@ public:
   void SetBitangentAttribute(std::string attname, GLuint location, GLenum bufferType);
 
 private:
-	float *m_vertices;
-  float *m_texcoord;
-  float *m_tangents;
-  float *m_bitangents;
+  VertexInfo* m_grid;
+
+  GLuint m_idxbuff;
+  GLuint* m_indexes;
 
   std::string m_vertex;
   std::string m_normal;
