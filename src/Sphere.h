@@ -23,16 +23,20 @@ public:
   void EndDraw() {}
 
   void SetVertexAttribute(std::string attname, GLuint location, GLenum bufferType);
+
   void SetNormalAttribute(std::string attname, GLuint location, GLenum bufferType);
+
   void SetTextureAttribute(std::string attname, GLuint location, GLenum bufferType);
+
   void SetTangentAttribute(std::string attname, GLuint location, GLenum bufferType);
+
   void SetBitangentAttribute(std::string attname, GLuint location, GLenum bufferType);
 
 private:
-  VertexInfo* m_grid;
-
-  GLuint m_idxbuff;
-  GLuint* m_indexes;
+	float *m_vertices;
+  float *m_texcoord;
+  float *m_tangents;
+  float *m_bitangents;
 
   std::string m_vertex;
   std::string m_normal;
@@ -41,7 +45,8 @@ private:
   std::string m_bitangent;
 
 	int m_size;
-
+  int m_indexes_size;
+  GLuint m_idxbuff;
 };
 
 #endif
