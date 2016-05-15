@@ -45,11 +45,11 @@ static void Init()
   shader->CreateShader("shaders\\fshader.frag.glsl", GL_FRAGMENT_SHADER);
 
   sphere.Init(shader);
-  sphere.SetAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  sphere.SetAttribute("normal", 1, GL_ARRAY_BUFFER);
-  sphere.SetAttribute("texcoord", 2, GL_ARRAY_BUFFER);
-  sphere.SetAttribute("tan", 3, GL_ARRAY_BUFFER);
-  sphere.SetAttribute("binorm", 4, GL_ARRAY_BUFFER);
+  sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  sphere.SetNormalAttribute("normal", 1, GL_ARRAY_BUFFER);
+  sphere.SetTextureAttribute("texcoord", 2, GL_ARRAY_BUFFER);
+  sphere.SetTangentAttribute("tan", 3, GL_ARRAY_BUFFER);
+  sphere.SetBitangentAttribute("binorm", 4, GL_ARRAY_BUFFER);
   sphere.TransferData();
 
   tex.Init("..\\textures\\moon.bmp");
