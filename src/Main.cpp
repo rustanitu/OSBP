@@ -41,8 +41,8 @@ static void Init()
 
   shader = new ShaderProgram();
   shader->Init();
-  shader->CreateShader("shaders\\vshader.vert.glsl", GL_VERTEX_SHADER);
-  shader->CreateShader("shaders\\fshader.frag.glsl", GL_FRAGMENT_SHADER);
+  shader->CreateShader("shaders\\bumpmap.vert.glsl", GL_VERTEX_SHADER);
+  shader->CreateShader("shaders\\bumpmap.frag.glsl", GL_FRAGMENT_SHADER);
 
   sphere.Init(shader);
   sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
@@ -85,14 +85,14 @@ static void DrawScene()
   shader->SetUniform("model", model);
   shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
 
-  shader->SetUniform("light", cam->GetEye() + glm::vec3(0, 0, 10));
+  shader->SetUniform("light", cam->GetEye() + glm::vec3(-999999999, 0, 0));
   shader->SetUniform("eye", cam->GetEye());
 
   glm::vec3 white = glm::vec3(1, 1, 1);
   shader->SetUniform("amb", white * 0.1f);
   shader->SetUniform("diff", white * 1.0f);
-  shader->SetUniform("spec", white * 0.25f);
-  shader->SetUniform("shi", 10.0f);
+  shader->SetUniform("spec", white * 0.15f);
+  shader->SetUniform("shi", 120.0f);
 
   shader->SetUniform("normtexture", texnormals.m_id);
   shader->SetUniform("difftexture", tex.m_id);

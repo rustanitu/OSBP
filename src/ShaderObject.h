@@ -35,6 +35,11 @@ public:
     return m_manip;
   }
 
+  void SetModel(glm::mat4 model)
+  {
+    m_model = model;
+  }
+
   glm::mat4 GetModel()
   {
     return m_model;

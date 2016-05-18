@@ -20,9 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Camera.cpp" />
+    <ClCompile Include="..\src\FBTexture.cpp" />
     <ClCompile Include="..\src\Image\Image.c" />
+    <ClCompile Include="..\src\Light.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\Manipulator.cpp" />
+    <ClCompile Include="..\src\Material.cpp" />
     <ClCompile Include="..\src\ShaderObject.cpp" />
     <ClCompile Include="..\src\ShaderProgram.cpp" />
     <ClCompile Include="..\src\ShaderTexture.cpp" />
@@ -30,8 +33,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Camera.h" />
+    <ClInclude Include="..\src\FBTexture.h" />
     <ClInclude Include="..\src\Image\Image.h" />
+    <ClInclude Include="..\src\Light.h" />
     <ClInclude Include="..\src\Manipulator.h" />
+    <ClInclude Include="..\src\Material.h" />
     <ClInclude Include="..\src\ShaderObject.h" />
     <ClInclude Include="..\src\ShaderProgram.h" />
     <ClInclude Include="..\src\ShaderTexture.h" />
@@ -39,8 +45,10 @@
     <ClInclude Include="..\src\Triangle.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\shaders\fshader.frag.glsl" />
-    <None Include="..\src\shaders\vshader.vert.glsl" />
+    <None Include="..\src\shaders\bumpmap.frag.glsl" />
+    <None Include="..\src\shaders\bumpmap.vert.glsl" />
+    <None Include="..\src\shaders\deferred.frag.glsl" />
+    <None Include="..\src\shaders\deferred.vert.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D236B4EC-C054-4873-AAAB-5F8C1D60E6D8}</ProjectGuid>
