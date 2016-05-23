@@ -21,11 +21,13 @@
   <ItemGroup>
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\FBTexture.cpp" />
+    <ClCompile Include="..\src\FrameBuffer.cpp" />
     <ClCompile Include="..\src\Image\Image.c" />
     <ClCompile Include="..\src\Light.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\Manipulator.cpp" />
     <ClCompile Include="..\src\Material.cpp" />
+    <ClCompile Include="..\src\Quad.cpp" />
     <ClCompile Include="..\src\ShaderObject.cpp" />
     <ClCompile Include="..\src\ShaderProgram.cpp" />
     <ClCompile Include="..\src\ShaderTexture.cpp" />
@@ -34,10 +36,12 @@
   <ItemGroup>
     <ClInclude Include="..\src\Camera.h" />
     <ClInclude Include="..\src\FBTexture.h" />
+    <ClInclude Include="..\src\FrameBuffer.h" />
     <ClInclude Include="..\src\Image\Image.h" />
     <ClInclude Include="..\src\Light.h" />
     <ClInclude Include="..\src\Manipulator.h" />
     <ClInclude Include="..\src\Material.h" />
+    <ClInclude Include="..\src\Quad.h" />
     <ClInclude Include="..\src\ShaderObject.h" />
     <ClInclude Include="..\src\ShaderProgram.h" />
     <ClInclude Include="..\src\ShaderTexture.h" />

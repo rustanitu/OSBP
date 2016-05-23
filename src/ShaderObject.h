@@ -13,7 +13,7 @@ class ShaderObject
 public:
   ShaderObject();
 
-  void Init(ShaderProgram* shader);
+  void Init();
 
   ~ShaderObject();
 
@@ -24,6 +24,11 @@ public:
   virtual void Draw() = 0;
 
   virtual void EndDraw() = 0;
+
+  void SetShader(ShaderProgram* shader)
+  {
+    m_shader = shader;
+  }
 
   void SetManipulatorCamera(Camera* cam)
   {

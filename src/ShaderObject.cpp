@@ -5,10 +5,9 @@ ShaderObject::ShaderObject()
 {
 }
 
-void ShaderObject::Init(ShaderProgram* shader)
+void ShaderObject::Init()
 {
   glGenVertexArrays(1, &m_vao);
-  m_shader = shader;
   m_manip = new Manipulator(&m_model);
 }
 

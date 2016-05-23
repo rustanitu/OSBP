@@ -10,13 +10,6 @@
 class ShaderProgram
 {
 public:
-  enum ATTRIBUTE_TYPE
-  {
-    TRIANGLE_VERTICES,
-    PRIMITIVE_VERTICES,
-    GENERIC
-  };
-
   ShaderProgram();
   void Init();
   ~ShaderProgram();

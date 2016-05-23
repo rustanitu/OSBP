@@ -25,9 +25,9 @@ void FBTexture::Init(GLint format, GLenum datatype, GLenum attachment)
 void FBTexture::LoadTexture()
 {
   glEnable(GL_TEXTURE_2D);
-  // ???? glActiveTexture(GL_TEXTURE0 + m_id);     ???
+  glActiveTexture(GL_TEXTURE0 + m_id);
   glBindTexture(GL_TEXTURE_2D, m_id);
-  glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_width, m_height, 0, m_format, m_datatype, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, m_width, m_height, 0, m_format, m_datatype, NULL);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
