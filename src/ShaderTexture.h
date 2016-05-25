@@ -14,6 +14,7 @@ public:
 
   void Init(char* file);
   void LoadTexture();
+  void Bind();
 
   GLuint m_id;
 private:

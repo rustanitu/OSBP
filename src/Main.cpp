@@ -29,10 +29,7 @@ ShaderTexture texnormals;
 //FBTexture difftex;
 //FBTexture spectex;
 
-FBTexture gbuffer(W, H);
-
 Quad quad;
-
 FrameBuffer frameBuffer;
 
 
@@ -51,8 +48,8 @@ static void Init()
   glutInitContextProfile(GLUT_CORE_PROFILE);
 
   // init OpenGL state
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_TEXTURE_2D);
 
   cam = new Camera(W, H);
   cam->SetEye(0, 0, 3);
@@ -90,7 +87,9 @@ static void Init()
   //Manipulator::SetCurrent(quad.GetManipulator());
 
   tex.Init("..\\textures\\moon.bmp");
+  tex.LoadTexture();
   texnormals.Init("..\\textures\\moonnorm.bmp");
+  texnormals.LoadTexture();
 
   //verttex.Init(GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
   //normtex.Init(GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT1);
@@ -98,11 +97,7 @@ static void Init()
   //difftex.Init(GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT3);
   //spectex.Init(GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT4);
   
-  frameBuffer.Init();
-  frameBuffer.LoadTexture();
-
-  gbuffer.Init(GL_RGB, GL_FLOAT, GL_COLOR_ATTACHMENT0);
-  gbuffer.LoadTexture();
+  frameBuffer.Init(1, W, H, true);
 }
 
 // Reshape callback
@@ -111,13 +106,16 @@ static void Reshape(int w, int h)
   glViewport(0, 0, w, h);
   cam->SetViewport(w, h);
   cam->SetupCamera();
+  frameBuffer.InitTextures(w, h);
 }
 
 // Draw scene //
 static void DrawScene()
 {
-  frameBuffer.LoadTexture();
-  gbuffer.LoadTexture();
+  //frameBuffer.DrawBind();
+  glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.m_id);
+  glClearColor(0.0, 0.0, 0.0, 1.0);
+  glClearDepth(1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   shader->UseProgram();
@@ -137,20 +135,26 @@ static void DrawScene()
   shader->SetUniform("spec", white * 0.15f);
   shader->SetUniform("shi", 120.0f);
 
+  texnormals.Bind();
   shader->SetUniform("normtexture", texnormals.m_id);
+  tex.Bind();
   shader->SetUniform("difftexture", tex.m_id);
 
-  texnormals.LoadTexture();
-  tex.LoadTexture();
-  
   sphere.Draw();
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  //glDrawBuffer(GL_FRONT);
+  glClearColor(1.0, 0.0, 0.0, 1.0);
+  glClearDepth(1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  shader2->UseProgram();
+  //frameBuffer.ReadBind();
 
-  shader2->SetUniform("tex", gbuffer.m_id);
+  //glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+  shader2->UseProgram();
+  frameBuffer.GetTextureBuffer(GL_COLOR_ATTACHMENT0)->Bind();
+  shader2->SetUniform("tex", frameBuffer.GetTextureBuffer(GL_COLOR_ATTACHMENT0)->m_id);
   quad.Draw();
 }
 
@@ -162,6 +166,7 @@ static void Display(void)
   // draw scene
   DrawScene();
   glutSwapBuffers();
+  glutPostRedisplay();
 }
 
 // Main function

@@ -2,7 +2,9 @@
 
 in vec3 vertex;
 
+uniform mat4 mvp;
+
 void main()
 {
-  gl_Position = vec4(vertex, 1.0f);
+  gl_Position = mvp * vec4(vertex, 1.0f);
 } 

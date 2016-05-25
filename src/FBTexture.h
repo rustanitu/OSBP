@@ -6,25 +6,14 @@
 class FBTexture
 {
 public:
-  FBTexture(GLuint width, GLuint height);
+  FBTexture(GLuint id);
   ~FBTexture();
 
-  void Init(GLint format, GLenum datatype, GLenum attachment);
-  void LoadTexture();
-
-  void SetDimensions(GLuint width, GLuint height)
-  {
-    m_width = width;
-    m_height = height;
-  }
+  void Init(GLenum attachment, GLuint width, GLuint height);
+  void InitDepth(GLuint width, GLuint height);
+  void Bind();
 
   GLuint m_id;
-private:
-  GLuint m_height;
-  GLuint m_width;
-  GLint m_format;
-  GLenum m_datatype;
-  GLenum m_attachment;
 };
 
 #endif

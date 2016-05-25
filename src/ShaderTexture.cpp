@@ -22,12 +22,15 @@ void ShaderTexture::Init(char* file)
 
 void ShaderTexture::LoadTexture()
 {
-  glEnable(GL_TEXTURE_2D);
-  glActiveTexture(GL_TEXTURE0 + m_id);
-  glBindTexture(GL_TEXTURE_2D, m_id);
+  Bind();
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgGetWidth(m_bmp), imgGetHeight(m_bmp), 0, GL_RGB, GL_FLOAT, imgGetData(m_bmp));
-
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void ShaderTexture::Bind()
+{
+  glActiveTexture(GL_TEXTURE0 + m_id);
+  glBindTexture(GL_TEXTURE_2D, m_id);
 }
