@@ -18,10 +18,7 @@ void ShaderTexture::Init(char* file)
 {
   m_bmp = imgReadBMP(file);
   glGenTextures(1, &m_id);
-}
 
-void ShaderTexture::LoadTexture()
-{
   glEnable(GL_TEXTURE_2D);
   glActiveTexture(GL_TEXTURE0 + m_id);
   glBindTexture(GL_TEXTURE_2D, m_id);
@@ -30,4 +27,11 @@ void ShaderTexture::LoadTexture()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void ShaderTexture::LoadTexture()
+{
+  glEnable(GL_TEXTURE_2D);
+  glActiveTexture(GL_TEXTURE0 + m_id);
+  glBindTexture(GL_TEXTURE_2D, m_id);
 }

@@ -23,6 +23,7 @@
     <ClCompile Include="..\src\Image\Image.c" />
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\Manipulator.cpp" />
+    <ClCompile Include="..\src\Quad.cpp" />
     <ClCompile Include="..\src\ShaderObject.cpp" />
     <ClCompile Include="..\src\ShaderProgram.cpp" />
     <ClCompile Include="..\src\ShaderTexture.cpp" />
@@ -32,6 +33,7 @@
     <ClInclude Include="..\src\Camera.h" />
     <ClInclude Include="..\src\Image\Image.h" />
     <ClInclude Include="..\src\Manipulator.h" />
+    <ClInclude Include="..\src\Quad.h" />
     <ClInclude Include="..\src\ShaderObject.h" />
     <ClInclude Include="..\src\ShaderProgram.h" />
     <ClInclude Include="..\src\ShaderTexture.h" />
@@ -40,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\fshader.frag.glsl" />
+    <None Include="..\src\shaders\quad.frag.glsl" />
+    <None Include="..\src\shaders\quad.vert.glsl" />
     <None Include="..\src\shaders\vshader.vert.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
