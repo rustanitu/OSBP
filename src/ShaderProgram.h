@@ -56,6 +56,12 @@ public:
     glUniform3fv(id, 1, &uniform[0]);
   }
 
+  void SetUniform(const char* name, GLuint n, glm::vec3* uniform)
+  {
+    GLuint id = glGetUniformLocation(m_id, name);
+    glUniform3fv(id, n, &(*uniform)[0]);
+  }
+
   void SetUniform(const char* name, glm::vec4 uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);

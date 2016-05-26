@@ -91,5 +91,17 @@
     <None Include="..\src\shaders\color.frag.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\src\shaders\repass_d.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shaders\repass_d.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shaders\lighting_d.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shaders\lighting_d.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -6,8 +6,8 @@
 Camera::Camera(int width, int height)
 :m_width(width), m_height(height)
 {
-  m_eye = glm::vec3(0, 0, 0);
-  m_at = glm::vec3(0, 0, -1);
+  m_eye = glm::vec3(0, 0, 1);
+  m_at = glm::vec3(0, 0, 0);
   m_up = glm::vec3(0, 1, 0);
 
   m_fov = 45;
