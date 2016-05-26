@@ -3,9 +3,10 @@
 in vec2 st;
 
 uniform sampler2D tex;
+uniform sampler2D tex2;
 
-out vec4 color;
+out vec3 color;
 void main()
 {
-  color = texture(tex, st);
+  color = texture2D(tex, st).xyz;// * texture2D(tex2, st).xyz;
 }

@@ -85,5 +85,11 @@
     <None Include="..\src\shaders\quad.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\src\shaders\world.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shaders\color.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

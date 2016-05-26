@@ -16,58 +16,17 @@ const int W = 800;
 const int H = 600;
 ShaderProgram* scene_shader = NULL;
 ShaderProgram* quad_shader = NULL;
+ShaderProgram* blue_sphere_shader = NULL;
 Camera* cam = NULL;
 Sphere sphere;
+Sphere blue_sphere;
 Quad quad;
 GLuint vao, vbo[1];
 Manipulator* manip = NULL;
 ShaderTexture tex;
 ShaderTexture texnormals;
 ShaderTexture wall;
-
-
-// Initialization function
-//static void Init()
-//{
-//  // open GLEW
-//  GLenum err = glewInit();
-//  if (GLEW_OK != err)
-//  {
-//    fprintf(stderr, "GLEW Error: %s\n", glewGetErrorString(err));
-//    exit(!1);
-//  }
-//  glutInitContextVersion(4, 5);
-//  glutInitContextProfile(GLUT_CORE_PROFILE);
-//
-//  // init OpenGL state
-//  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-//  glEnable(GL_DEPTH_TEST);
-//
-//  scene_shader = new ShaderProgram();
-//  scene_shader->Init();
-//  scene_shader->CreateShader("shaders\\vshader.vert.glsl", GL_VERTEX_SHADER);
-//  scene_shader->CreateShader("shaders\\fshader.frag.glsl", GL_FRAGMENT_SHADER);
-//
-//  sphere.Init(scene_shader);
-//  sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-//  sphere.SetNormalAttribute("normal", 1, GL_ARRAY_BUFFER);
-//  sphere.SetTextureAttribute("texcoord", 2, GL_ARRAY_BUFFER);
-//  sphere.SetTangentAttribute("tan", 3, GL_ARRAY_BUFFER);
-//  sphere.SetBitangentAttribute("bitan", 4, GL_ARRAY_BUFFER);
-//  sphere.TransferData();
-//
-//  tex.Init("..\\textures\\moon.bmp");
-//  texnormals.Init("..\\textures\\moonnorm.bmp");
-//
-//  scene_shader->LinkProgram();
-//
-//  cam = new Camera(W, H);
-//  cam->SetEye(0, 0, 3);
-//  cam->SetupCamera();
-//
-//  sphere.SetManipulatorCamera(cam);
-//  Manipulator::SetCurrent(sphere.GetManipulator());
-//}
+GLuint _fb, _fb_tex_p, _fb_tex_n, _rb;
 
 // Reshape callback
 static void Reshape(int w, int h)
@@ -77,33 +36,35 @@ static void Reshape(int w, int h)
   cam->SetupCamera();
 }
 
-// Draw scene //
-static void DrawScene()
+void FramebufferInit()
 {
-  glClear(GL_COLOR_BUFFER_BIT);
-  scene_shader->UseProgram();
+  //* FrameBuffer Init
+  glGenFramebuffers(1, &_fb);
+  glBindFramebuffer(GL_FRAMEBUFFER, _fb);
 
-  glm::mat4 model = sphere.GetModel();
-  glm::mat4 mvp = cam->m_proj * cam->m_view * model;
-  scene_shader->SetUniform("mvp", mvp);
-  scene_shader->SetUniform("model", model);
-  scene_shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
 
-  scene_shader->SetUniform("light", cam->GetEye() + glm::vec3(0, 0, 10));
-  scene_shader->SetUniform("eye", cam->GetEye());
+  // Texture Init to receive the framebuffer render
+  glGenTextures(1, &_fb_tex_p);
+  glBindTexture(GL_TEXTURE_2D, _fb_tex_p);
 
-  glm::vec3 white = glm::vec3(1, 1, 1);
-  scene_shader->SetUniform("amb", white * 0.1f);
-  scene_shader->SetUniform("diff", white * 1.0f);
-  scene_shader->SetUniform("spec", white * 0.25f);
-  scene_shader->SetUniform("shi", 200.0f);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, W, H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
-  texnormals.LoadTexture();
-  scene_shader->SetUniform("normtexture", texnormals.m_id);
-  tex.LoadTexture();
-  scene_shader->SetUniform("difftexture", tex.m_id);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  sphere.Draw();
+
+  // Attach Texture and FrameBuffer
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _fb_tex_p, 0);
+
+
+  // Depth Init
+  glGenRenderbuffers(1, &_rb);
+  glBindRenderbuffer(GL_RENDERBUFFER, _rb);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, W, H);
+
+
+  // Attach Depth
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _rb);
 }
 
 void Init()
@@ -129,6 +90,12 @@ void Init()
   quad_shader->CreateShader("shaders\\quad.vert.glsl", GL_VERTEX_SHADER);
   quad_shader->CreateShader("shaders\\quad.frag.glsl", GL_FRAGMENT_SHADER);
   quad_shader->LinkProgram();
+
+  blue_sphere_shader = new ShaderProgram();
+  blue_sphere_shader->Init();
+  blue_sphere_shader->CreateShader("shaders\\world.vert.glsl", GL_VERTEX_SHADER);
+  blue_sphere_shader->CreateShader("shaders\\color.frag.glsl", GL_FRAGMENT_SHADER);
+  blue_sphere_shader->LinkProgram();
   
   cam = new Camera(W, H);
   cam->SetEye(0, 0, 3);
@@ -141,6 +108,10 @@ void Init()
   sphere.SetTangentAttribute("tan", 3, GL_ARRAY_BUFFER);
   sphere.SetBitangentAttribute("bitan", 4, GL_ARRAY_BUFFER);
   sphere.TransferData();
+
+  blue_sphere.Init(scene_shader);
+  blue_sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  blue_sphere.TransferData();
   
   sphere.SetManipulatorCamera(cam);
   Manipulator::SetCurrent(sphere.GetManipulator());
@@ -153,6 +124,8 @@ void Init()
   tex.Init("..\\textures\\moon.bmp");
   texnormals.Init("..\\textures\\moonnorm.bmp");
   wall.Init("..\\textures\\BrokenWall.bmp");
+
+  FramebufferInit();
 }
 
 void SceneRender()
@@ -168,7 +141,7 @@ void SceneRender()
   scene_shader->SetUniform("light", cam->GetEye() + glm::vec3(0, 0, 10));
   scene_shader->SetUniform("eye", cam->GetEye());
 
-  glm::vec3 white = glm::vec3(1, 1, 1);
+  glm::vec3 white(1, 1, 1);
   scene_shader->SetUniform("amb", white * 0.1f);
   scene_shader->SetUniform("diff", white * 1.0f);
   scene_shader->SetUniform("spec", white * 0.25f);
@@ -182,81 +155,51 @@ void SceneRender()
   sphere.Draw();
 }
 
-void TestDraw()
+void BlueSphereRender()
 {
-  //* FrameBuffer Init
-  GLuint frameBuffer;
-  glGenFramebuffers(1, &frameBuffer);
-  glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+  blue_sphere_shader->UseProgram();
+  blue_sphere_shader->SetUniform("mvp", cam->m_proj * cam->m_view);
+  blue_sphere.Draw();
+}
 
+void QuadRender()
+{
+  quad_shader->UseProgram();
 
-  // Texture Init to receive the framebuffer render
-  GLuint texColorBuffer;
-  glGenTextures(1, &texColorBuffer);
-  glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+  glActiveTexture(GL_TEXTURE0 + _fb_tex_p);
+  glBindTexture(GL_TEXTURE_2D, _fb_tex_p);
+  quad_shader->SetUniform("tex", _fb_tex_p);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, W, H, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  glActiveTexture(GL_TEXTURE0 + _fb_tex_n);
+  glBindTexture(GL_TEXTURE_2D, _fb_tex_n);
+  quad_shader->SetUniform("tex2", _fb_tex_n);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  quad.Draw();
+}
 
+void DrawScene()
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, _fb);
+  GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+  glDrawBuffers(2, draw_bufs);
 
-  // Attach Texture and FrameBuffer
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-
-
-  // Depth Init
-  GLuint rboDepthStencil;
-  glGenRenderbuffers(1, &rboDepthStencil);
-  glBindRenderbuffer(GL_RENDERBUFFER, rboDepthStencil);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, W, H);
-
-
-  // Attach Depth
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboDepthStencil);
-
-
-  // Render to FrameBuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-  //glEnable(GL_DEPTH_TEST);
-  //*/
-
-  //* Scene Render
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glClearColor(0.2, 0.2, 0.6, 1);
   glEnable(GL_DEPTH_TEST);
-  //SceneRender();
-  quad_shader->UseProgram();
-  wall.LoadTexture();
-  quad_shader->SetUniform("tex", wall.m_id);
-  quad.Draw();
+
+
+  //* Scene Render
+  SceneRender();
   //*/
 
-
-  //* Bind default framebuffer and draw contents of our framebuffer
+  // deferred pass
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glClearColor(0.52, 0.52, 0.2, 1.0f); // added ambient light here
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDisable(GL_DEPTH_TEST);
-  //*/
-
 
   //* Quad Render with Texture
-  quad_shader->UseProgram();
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-  quad_shader->SetUniform("tex", texColorBuffer);
-  quad.Draw();
-  //*/
-
-
-  //* Depth delete
-  glDeleteRenderbuffers(1, &rboDepthStencil);
-
-
-  // Texture delete
-  glDeleteTextures(1, &texColorBuffer);
-
-  // FrameBuffer Delete
-  glDeleteFramebuffers(1, &frameBuffer);
+  QuadRender();
   //*/
 }
 
@@ -266,8 +209,8 @@ static void Display(void)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // draw scene
-  //DrawScene();
-  TestDraw();
+  DrawScene();
+  
   glutSwapBuffers();
   glutPostRedisplay();
 }

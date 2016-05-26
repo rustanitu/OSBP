@@ -221,45 +221,75 @@ void Sphere::TransferData()
 {
   glBindVertexArray(m_vao);
 
-  glBindBuffer(m_bufferTypes[m_vertex], m_buffers[m_vertex]);
-  glBufferData(m_bufferTypes[m_vertex], 3 * m_size * sizeof(float), (void*)m_vertices, GL_STATIC_DRAW);
+  if (m_buffers.find(m_vertex) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_vertex], m_buffers[m_vertex]);
+    glBufferData(m_bufferTypes[m_vertex], 3 * m_size * sizeof(float), (void*)m_vertices, GL_STATIC_DRAW);
+  }
 
-  glBindBuffer(m_bufferTypes[m_normal], m_buffers[m_normal]);
-  glBufferData(m_bufferTypes[m_normal], 3 * m_size * sizeof(float), (void*)m_vertices, GL_STATIC_DRAW);
+  if (m_buffers.find(m_normal) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_normal], m_buffers[m_normal]);
+    glBufferData(m_bufferTypes[m_normal], 3 * m_size * sizeof(float), (void*)m_vertices, GL_STATIC_DRAW);
+  }
 
-  glBindBuffer(m_bufferTypes[m_texture], m_buffers[m_texture]);
-  glBufferData(m_bufferTypes[m_texture], 2 * m_size * sizeof(float), (void*)m_texcoord, GL_STATIC_DRAW);
+  if (m_buffers.find(m_texture) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_texture], m_buffers[m_texture]);
+    glBufferData(m_bufferTypes[m_texture], 2 * m_size * sizeof(float), (void*)m_texcoord, GL_STATIC_DRAW);
+  }
 
-  glBindBuffer(m_bufferTypes[m_tangent], m_buffers[m_tangent]);
-  glBufferData(m_bufferTypes[m_tangent], 3 * m_size * sizeof(float), (void*)m_tangents, GL_STATIC_DRAW);
+  if (m_buffers.find(m_tangent) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_tangent], m_buffers[m_tangent]);
+    glBufferData(m_bufferTypes[m_tangent], 3 * m_size * sizeof(float), (void*)m_tangents, GL_STATIC_DRAW);
+  }
 
-  glBindBuffer(m_bufferTypes[m_bitangent], m_buffers[m_bitangent]);
-  glBufferData(m_bufferTypes[m_bitangent], 3 * m_size * sizeof(float), (void*)m_bitangents, GL_STATIC_DRAW);
+  if (m_buffers.find(m_bitangent) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_bitangent], m_buffers[m_bitangent]);
+    glBufferData(m_bufferTypes[m_bitangent], 3 * m_size * sizeof(float), (void*)m_bitangents, GL_STATIC_DRAW);
+  }
 }
 
 void Sphere::ConnectBuffer()
 {
   glBindVertexArray(m_vao);
 
-  glBindBuffer(m_bufferTypes[m_vertex], m_buffers[m_vertex]);
-  glEnableVertexAttribArray(m_attributes[m_vertex]);
-  glVertexAttribPointer(m_attributes[m_vertex], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  if (m_buffers.find(m_vertex) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_vertex], m_buffers[m_vertex]);
+    glEnableVertexAttribArray(m_attributes[m_vertex]);
+    glVertexAttribPointer(m_attributes[m_vertex], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  }
 
-  glBindBuffer(m_bufferTypes[m_normal], m_buffers[m_normal]);
-  glEnableVertexAttribArray(m_attributes[m_normal]);
-  glVertexAttribPointer(m_attributes[m_normal], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  if (m_buffers.find(m_normal) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_normal], m_buffers[m_normal]);
+    glEnableVertexAttribArray(m_attributes[m_normal]);
+    glVertexAttribPointer(m_attributes[m_normal], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  }
 
-  glBindBuffer(m_bufferTypes[m_texture], m_buffers[m_texture]);
-  glEnableVertexAttribArray(m_attributes[m_texture]);
-  glVertexAttribPointer(m_attributes[m_texture], 2, GL_FLOAT, GL_FALSE, 0, 0);
+  if (m_buffers.find(m_texture) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_texture], m_buffers[m_texture]);
+    glEnableVertexAttribArray(m_attributes[m_texture]);
+    glVertexAttribPointer(m_attributes[m_texture], 2, GL_FLOAT, GL_FALSE, 0, 0);
+  }
 
-  glBindBuffer(m_bufferTypes[m_tangent], m_buffers[m_tangent]);
-  glEnableVertexAttribArray(m_attributes[m_tangent]);
-  glVertexAttribPointer(m_attributes[m_tangent], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  if (m_buffers.find(m_tangent) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_tangent], m_buffers[m_tangent]);
+    glEnableVertexAttribArray(m_attributes[m_tangent]);
+    glVertexAttribPointer(m_attributes[m_tangent], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  }
 
-  glBindBuffer(m_bufferTypes[m_bitangent], m_buffers[m_bitangent]);
-  glEnableVertexAttribArray(m_attributes[m_bitangent]);
-  glVertexAttribPointer(m_attributes[m_bitangent], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  if (m_buffers.find(m_bitangent) != m_buffers.end())
+  {
+    glBindBuffer(m_bufferTypes[m_bitangent], m_buffers[m_bitangent]);
+    glEnableVertexAttribArray(m_attributes[m_bitangent]);
+    glVertexAttribPointer(m_attributes[m_bitangent], 3, GL_FLOAT, GL_FALSE, 0, 0);
+  }
 }
 
 void Sphere::Draw()
