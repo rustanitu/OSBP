@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include <GL\glew.h>
 #include <GL\freeglut.h>
 
@@ -12,21 +13,15 @@
 
 #include <glm\gtc\matrix_transform.hpp>
 
+#define PI 3.14159265359
+#define NSPHERE 5
+#define NLIGHTS 20
+
 int W = 800;
 int H = 600;
-ShaderProgram* scene_shader = NULL;
-ShaderProgram* quad_shader = NULL;
-ShaderProgram* blue_sphere_shader = NULL;
 Camera* cam = NULL;
-GLuint n_spheres = 5;
-Sphere sphere;
 Sphere blue_sphere;
 Quad quad;
-GLuint vao, vbo[1];
-Manipulator* manip = NULL;
-ShaderTexture tex;
-ShaderTexture texnormals;
-ShaderTexture wall;
 
 GLuint framebuffer;
 GLuint vertex_buff;
@@ -38,6 +33,28 @@ GLuint depthbuffer;
 
 ShaderProgram* first_pass = NULL;
 ShaderProgram* second_pass = NULL;
+
+const glm::vec3 WHITE(1.0f, 1.0f, 1.0f);
+const glm::vec3 RED(1.0f, 0.0f, 0.0f);
+const glm::vec3 GREEN(0.0f, 1.0f, 0.0f);
+const glm::vec3 BLUE(0.0f, 0.0f, 1.0f);
+const glm::vec3 YELLOW(1.0f, 1.0f, 0.0f);
+const glm::vec3 PINK(1.0f, 0.0f, 1.0f);
+const glm::vec3 CYAN(0.0f, 1.0f, 1.0f);
+const glm::vec3 COLORS[7] = 
+{
+  WHITE,
+  RED,
+  GREEN,
+  BLUE,
+  YELLOW,
+  CYAN
+};
+
+glm::vec3 LIGHT_POS[NLIGHTS];
+glm::vec3 LIGHT_SPOT[NLIGHTS];
+glm::vec3 LIGHT_COLORS[NLIGHTS];
+GLfloat THETA = 0;
 
 void FramebufferInit()
 {
@@ -143,24 +160,6 @@ void Init()
   glutInitContextVersion(4, 5);
   glutInitContextProfile(GLUT_CORE_PROFILE);
 
-  scene_shader = new ShaderProgram();
-  scene_shader->Init();
-  scene_shader->CreateShader("shaders\\vshader.vert.glsl", GL_VERTEX_SHADER);
-  scene_shader->CreateShader("shaders\\fshader.frag.glsl", GL_FRAGMENT_SHADER);
-  scene_shader->LinkProgram();
-
-  quad_shader = new ShaderProgram();
-  quad_shader->Init();
-  quad_shader->CreateShader("shaders\\quad.vert.glsl", GL_VERTEX_SHADER);
-  quad_shader->CreateShader("shaders\\quad.frag.glsl", GL_FRAGMENT_SHADER);
-  quad_shader->LinkProgram();
-
-  blue_sphere_shader = new ShaderProgram();
-  blue_sphere_shader->Init();
-  blue_sphere_shader->CreateShader("shaders\\world.vert.glsl", GL_VERTEX_SHADER);
-  blue_sphere_shader->CreateShader("shaders\\color.frag.glsl", GL_FRAGMENT_SHADER);
-  blue_sphere_shader->LinkProgram();
-
   first_pass = new ShaderProgram();
   first_pass->Init();
   first_pass->CreateShader("shaders\\repass_d.vert.glsl", GL_VERTEX_SHADER);
@@ -178,16 +177,6 @@ void Init()
   cam->SetAt(0, 0, 2);
   cam->SetupCamera();
 
-  sphere.Init(scene_shader);
-  sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  sphere.SetNormalAttribute("normal", 1, GL_ARRAY_BUFFER);
-  sphere.SetTextureAttribute("texcoord", 2, GL_ARRAY_BUFFER);
-  sphere.SetTangentAttribute("tan", 3, GL_ARRAY_BUFFER);
-  sphere.SetBitangentAttribute("bitan", 4, GL_ARRAY_BUFFER);
-  sphere.TransferData();
-  sphere.SetManipulatorCamera(cam);
-  Manipulator::SetCurrent(sphere.GetManipulator());
-
   blue_sphere.Init(first_pass);
   blue_sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
   blue_sphere.SetNormalAttribute("normal", 1, GL_ARRAY_BUFFER);
@@ -198,38 +187,12 @@ void Init()
   quad.SetTextureAttribute("texcoord", 1, GL_ARRAY_BUFFER);
   quad.TransferData();
 
-  tex.Init("..\\textures\\moon.bmp");
-  texnormals.Init("..\\textures\\moonnorm.bmp");
-  wall.Init("..\\textures\\BrokenWall.bmp");
+  for (GLuint i = 0; i < NLIGHTS; ++i)
+  {
+    LIGHT_COLORS[i] = COLORS[rand() % 7];
+  }
 
   FramebufferInit();
-}
-
-void MoonRender(Sphere& sphere, glm::mat4 t)
-{
-  scene_shader->UseProgram();
-
-  glm::mat4 model = sphere.GetModel();
-  glm::mat4 mvp = cam->m_proj * cam->m_view * t * model;
-  scene_shader->SetUniform("mvp", mvp);
-  scene_shader->SetUniform("model", model);
-  scene_shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
-
-  scene_shader->SetUniform("light", cam->GetEye() + glm::vec3(0, 0, 10));
-  scene_shader->SetUniform("eye", cam->GetEye());
-
-  glm::vec3 white(1, 1, 1);
-  scene_shader->SetUniform("amb", white * 0.1f);
-  scene_shader->SetUniform("diff", white * 1.0f);
-  scene_shader->SetUniform("spec", white * 0.25f);
-  scene_shader->SetUniform("shi", 200.0f);
-
-  texnormals.LoadTexture();
-  scene_shader->SetUniform("normtexture", texnormals.m_id);
-  tex.LoadTexture();
-  scene_shader->SetUniform("difftexture", tex.m_id);
-
-  sphere.Draw();
 }
 
 void BlueSphereRender(glm::mat4 t)
@@ -240,17 +203,16 @@ void BlueSphereRender(glm::mat4 t)
   first_pass->SetUniform("m", t);
   first_pass->SetUniform("_m", glm::transpose(glm::inverse(t)));
 
-  glm::vec3 red(1, 0, 0);
-  first_pass->SetUniform("mamb", red * 0.25f);
-  first_pass->SetUniform("mdiff", red * 0.5f);
-  first_pass->SetUniform("mspec", glm::vec3(1, 1, 1));
-  first_pass->SetUniform("mshi", 64.0f);
+  first_pass->SetUniform("mamb", RED * 0.2f);
+  first_pass->SetUniform("mdiff", WHITE * 0.3f);
+  first_pass->SetUniform("mspec", WHITE * 0.6f);
+  first_pass->SetUniform("mshi", 128.0f);
   blue_sphere.Draw();
 }
 
 void SceneRender()
 {
-  int l = n_spheres;
+  int l = NSPHERE;
   int n = l * l;
   for (int i = 0; i < n; i++)
   {
@@ -259,7 +221,6 @@ void SceneRender()
     float x = ((i % l) - l / 2) * d;
     glm::mat4 t;
     t = glm::translate(t, glm::vec3(x, 0, z));
-    //MoonRender(sphere, t);
     BlueSphereRender(t);
   }
 }
@@ -288,21 +249,48 @@ void QuadRender()
   glBindTexture(GL_TEXTURE_2D, spec_buff);
   second_pass->SetUniform("spec_tex", spec_buff);
 
-  glm::vec3 red(0.4, 0.1, 0.1);
   second_pass->SetUniform("wrl_eye", cam->GetEye());
-  second_pass->SetUniform("gamb", red * 0.2f);
+  second_pass->SetUniform("gamb", RED * 0.1f);
 
-  GLuint nl = 1;
-  glm::vec3 light(0, 5, 0);
-  second_pass->SetUniform("nlight", nl);
-  second_pass->SetUniform("lpos", light);
+  int n = NLIGHTS / 2;
+  for (GLuint i = 0; i < n; ++i)
+  {
+    float dt = (i * 2 * PI) / n;
+    LIGHT_POS[i].x = 4 * sin(THETA + dt);
+    LIGHT_POS[i].y = cam->GetEye().y;
+    LIGHT_POS[i].z = 4 * cos(THETA + dt);
 
-  glm::vec3 white(1, 1, 1);
-  second_pass->SetUniform("lamb",  white);
-  second_pass->SetUniform("ldiff", white);
-  second_pass->SetUniform("lspec", white);
+    LIGHT_SPOT[i].z = 4 * sin(dt);
+    LIGHT_SPOT[i].y = 0;
+    LIGHT_SPOT[i].x = 4 * cos(dt);
+  }
+
+  for (GLuint i = 0; i < n; ++i)
+  {
+    float dt = (i * 2 * PI) / n;
+    LIGHT_POS[n+i].x = 8 * sin(THETA - dt);
+    LIGHT_POS[n+i].y = cam->GetEye().y;
+    LIGHT_POS[n+i].z = 8 * cos(THETA - dt);
+
+    LIGHT_SPOT[n+i].z = 8 * sin(dt);
+    LIGHT_SPOT[n+i].y = 0;
+    LIGHT_SPOT[n+i].x = 8 * cos(dt);
+  }
+
+  second_pass->SetUniform("nlight", (int)NLIGHTS);
+  second_pass->SetUniform("lpos", NLIGHTS, LIGHT_POS);
+
+  second_pass->SetUniform("lamb", NLIGHTS, LIGHT_COLORS);
+  second_pass->SetUniform("ldiff", NLIGHTS, LIGHT_COLORS);
+  second_pass->SetUniform("lspec", NLIGHTS, LIGHT_COLORS);
+  second_pass->SetUniform("lspot", NLIGHTS, LIGHT_SPOT);
 
   quad.Draw();
+
+  if (THETA < 2 * PI)
+    THETA += 0.05f;
+  else
+    THETA = 0.1f;
 }
 
 void DrawScene()
@@ -346,13 +334,14 @@ static void Display(void)
 // Main function
 int main (int argc, char* argv[])
 {
+  srand(time(NULL));
   // open GLUT
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
   glutInitWindowSize(W, H);
 
   // create window
-  glutCreateWindow("Bump Mapping Sphere");
+  glutCreateWindow("Deferred Shading");
   glutReshapeFunc(Reshape);
   glutDisplayFunc(Display);
 

@@ -13,6 +13,6 @@ out vec3 norm;
 void main()
 {
   gl_Position = mvp * vec4(vertex, 1);
-  vert = mat3(m) * vertex;
-  norm = mat3(_m) * normal;
+  vert = (m * vec4(vertex, 1)).xyz;
+  norm = (_m * vec4(normal, 1)).xyz;
 }

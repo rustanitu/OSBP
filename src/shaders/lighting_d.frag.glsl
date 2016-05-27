@@ -12,10 +12,11 @@ uniform vec3 wrl_eye;
 uniform vec3 gamb;
 
 uniform int nlight;
-uniform vec3 lpos;
-uniform vec3 lamb;
-uniform vec3 ldiff;
-uniform vec3 lspec;
+uniform vec3 lpos[20];
+uniform vec3 lamb[20];
+uniform vec3 ldiff[20];
+uniform vec3 lspec[20];
+uniform vec3 lspot[20];
 
 out vec3 color;
 void main()
@@ -34,9 +35,9 @@ void main()
   vec3 eye = normalize(wrl_eye - vertex);
   
   // Light Contibuition
-  for (int i = 0; i < nlight; i++)
+  for (int i = 0; i < nlight && i < 20; i++)
   {
-    vec3 light = normalize(lpos - vertex);
+    vec3 light = normalize(lpos[i] - vertex);
   
     // Diffuse
     float ndotl = dot(normal, light);
@@ -51,6 +52,15 @@ void main()
     }
   
     // Final Color
-    color += mamb * lamb + cdiff * ldiff + cspec * lspec;
+    vec3 c = mamb * lamb[i];
+    c += cdiff * ldiff[i];
+    c += cspec * lspec[i];
+    float dist = length(vertex - light);
+    float katt = nlight + dist;
+    katt += dist * dist;
+    float kspot = pow(max(dot(-light, normalize(lspot[i] - lpos[i])), 0.0f), 32.0f) * nlight;
+    c *= kspot;
+    c /= katt;
+    color += c;
   }
 }

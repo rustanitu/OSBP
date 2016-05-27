@@ -44,6 +44,12 @@ public:
     glUniform1i(id, uniform);
   }
 
+  void SetUniform(const char* name, int uniform)
+  {
+    GLuint id = glGetUniformLocation(m_id, name);
+    glUniform1i(id, uniform);
+  }
+
   void SetUniform(const char* name, float uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
@@ -59,7 +65,15 @@ public:
   void SetUniform(const char* name, GLuint n, glm::vec3* uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
-    glUniform3fv(id, n, &(*uniform)[0]);
+    float* cores = new float[n*3];
+    int j = 0;
+    for (int i = 0; i < n; i++)
+    {
+      cores[j++] = uniform[i].x;
+      cores[j++] = uniform[i].y;
+      cores[j++] = uniform[i].z;
+    }
+    glUniform3fv(id, n, cores);
   }
 
   void SetUniform(const char* name, glm::vec4 uniform)
