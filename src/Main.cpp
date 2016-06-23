@@ -14,14 +14,13 @@
 #include <glm\gtc\matrix_transform.hpp>
 
 #define PI 3.14159265359
-#define NSPHERE 5
-#define NLIGHTS 20
 
 int W = 800;
 int H = 600;
 Camera* cam = NULL;
-Sphere blue_sphere;
-Quad quad;
+Manipulator* manip = NULL;
+Sphere sphere;
+//Quad quad;
 
 GLuint framebuffer;
 GLuint vertex_buff;
@@ -32,7 +31,7 @@ GLuint spec_buff;
 GLuint depthbuffer;
 
 ShaderProgram* first_pass = NULL;
-ShaderProgram* second_pass = NULL;
+//ShaderProgram* second_pass = NULL;
 
 const glm::vec3 WHITE(1.0f, 1.0f, 1.0f);
 const glm::vec3 RED(1.0f, 0.0f, 0.0f);
@@ -50,11 +49,6 @@ const glm::vec3 COLORS[7] =
   YELLOW,
   CYAN
 };
-
-glm::vec3 LIGHT_POS[NLIGHTS];
-glm::vec3 LIGHT_SPOT[NLIGHTS];
-glm::vec3 LIGHT_COLORS[NLIGHTS];
-GLfloat THETA = 0;
 
 void FramebufferInit()
 {
@@ -144,8 +138,8 @@ static void Reshape(int w, int h)
   glViewport(0, 0, w, h);
   cam->SetViewport(w, h);
   cam->SetupCamera();
-  FramebufferFinish();
-  FramebufferInit();
+  //FramebufferFinish();
+  //FramebufferInit();
 }
 
 void Init()
@@ -162,37 +156,35 @@ void Init()
 
   first_pass = new ShaderProgram();
   first_pass->Init();
-  first_pass->CreateShader("shaders\\repass_d.vert.glsl", GL_VERTEX_SHADER);
-  first_pass->CreateShader("shaders\\repass_d.frag.glsl", GL_FRAGMENT_SHADER);
+  first_pass->CreateShader("shaders\\procedural.vert.glsl", GL_VERTEX_SHADER);
+  first_pass->CreateShader("shaders\\procedural.frag.glsl", GL_FRAGMENT_SHADER);
   first_pass->LinkProgram();
 
-  second_pass = new ShaderProgram();
-  second_pass->Init();
-  second_pass->CreateShader("shaders\\lighting_d.vert.glsl", GL_VERTEX_SHADER);
-  second_pass->CreateShader("shaders\\lighting_d.frag.glsl", GL_FRAGMENT_SHADER);
-  second_pass->LinkProgram();
+  //second_pass = new ShaderProgram();
+  //second_pass->Init();
+  //second_pass->CreateShader("shaders\\lighting_d.vert.glsl", GL_VERTEX_SHADER);
+  //second_pass->CreateShader("shaders\\lighting_d.frag.glsl", GL_FRAGMENT_SHADER);
+  //second_pass->LinkProgram();
   
   cam = new Camera(W, H);
-  cam->SetEye(0, 5, 8);
-  cam->SetAt(0, 0, 2);
+  cam->SetEye(0, 0, 3);
+  cam->SetAt(0, 0, 0);
   cam->SetupCamera();
 
-  blue_sphere.Init(first_pass);
-  blue_sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  blue_sphere.SetNormalAttribute("normal", 1, GL_ARRAY_BUFFER);
-  blue_sphere.TransferData();
+  sphere.Init(first_pass);
+  sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  sphere.SetTextureAttribute("texcoord", 1, GL_ARRAY_BUFFER);
+  sphere.TransferData();
+  sphere.SetManipulatorCamera(cam);
+  Manipulator::SetCurrent(sphere.GetManipulator());
+
   
-  quad.Init(second_pass);
-  quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  quad.SetTextureAttribute("texcoord", 1, GL_ARRAY_BUFFER);
-  quad.TransferData();
+  //quad.Init(first_pass);
+  //quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  //quad.SetTextureAttribute("texcoord", 1, GL_ARRAY_BUFFER);
+  //quad.TransferData();
 
-  for (GLuint i = 0; i < NLIGHTS; ++i)
-  {
-    LIGHT_COLORS[i] = COLORS[rand() % 7];
-  }
-
-  FramebufferInit();
+  //FramebufferInit();
 }
 
 void BlueSphereRender(glm::mat4 t)
@@ -207,97 +199,22 @@ void BlueSphereRender(glm::mat4 t)
   first_pass->SetUniform("mdiff", WHITE * 0.3f);
   first_pass->SetUniform("mspec", WHITE * 0.6f);
   first_pass->SetUniform("mshi", 128.0f);
-  blue_sphere.Draw();
+  sphere.Draw();
 }
 
 void SceneRender()
 {
-  int l = NSPHERE;
-  int n = l * l;
-  for (int i = 0; i < n; i++)
-  {
-    float d = 2.5f;
-    float z = ((i / l) - l / 2) * d;
-    float x = ((i % l) - l / 2) * d;
-    glm::mat4 t;
-    t = glm::translate(t, glm::vec3(x, 0, z));
-    BlueSphereRender(t);
-  }
-}
-
-void QuadRender()
-{
-  second_pass->UseProgram();
-
-  glActiveTexture(GL_TEXTURE0 + vertex_buff);
-  glBindTexture(GL_TEXTURE_2D, vertex_buff);
-  second_pass->SetUniform("vertex_tex", vertex_buff);
-
-  glActiveTexture(GL_TEXTURE0 + normal_buff);
-  glBindTexture(GL_TEXTURE_2D, normal_buff);
-  second_pass->SetUniform("normal_tex", normal_buff);
-
-  glActiveTexture(GL_TEXTURE0 + amb_buff);
-  glBindTexture(GL_TEXTURE_2D, amb_buff);
-  second_pass->SetUniform("amb_tex", amb_buff);
-
-  glActiveTexture(GL_TEXTURE0 + diff_buff);
-  glBindTexture(GL_TEXTURE_2D, diff_buff);
-  second_pass->SetUniform("diff_tex", diff_buff);
-
-  glActiveTexture(GL_TEXTURE0 + spec_buff);
-  glBindTexture(GL_TEXTURE_2D, spec_buff);
-  second_pass->SetUniform("spec_tex", spec_buff);
-
-  second_pass->SetUniform("wrl_eye", cam->GetEye());
-  second_pass->SetUniform("gamb", RED * 0.1f);
-
-  int n = NLIGHTS / 2;
-  for (GLuint i = 0; i < n; ++i)
-  {
-    float dt = (i * 2 * PI) / n;
-    LIGHT_POS[i].x = 4 * sin(THETA + dt);
-    LIGHT_POS[i].y = cam->GetEye().y;
-    LIGHT_POS[i].z = 4 * cos(THETA + dt);
-
-    LIGHT_SPOT[i].z = 4 * sin(dt);
-    LIGHT_SPOT[i].y = 0;
-    LIGHT_SPOT[i].x = 4 * cos(dt);
-  }
-
-  for (GLuint i = 0; i < n; ++i)
-  {
-    float dt = (i * 2 * PI) / n;
-    LIGHT_POS[n+i].x = 8 * sin(THETA - dt);
-    LIGHT_POS[n+i].y = cam->GetEye().y;
-    LIGHT_POS[n+i].z = 8 * cos(THETA - dt);
-
-    LIGHT_SPOT[n+i].z = 8 * sin(dt);
-    LIGHT_SPOT[n+i].y = 0;
-    LIGHT_SPOT[n+i].x = 8 * cos(dt);
-  }
-
-  second_pass->SetUniform("nlight", (int)NLIGHTS);
-  second_pass->SetUniform("lpos", NLIGHTS, LIGHT_POS);
-
-  second_pass->SetUniform("lamb", NLIGHTS, LIGHT_COLORS);
-  second_pass->SetUniform("ldiff", NLIGHTS, LIGHT_COLORS);
-  second_pass->SetUniform("lspec", NLIGHTS, LIGHT_COLORS);
-  second_pass->SetUniform("lspot", NLIGHTS, LIGHT_SPOT);
-
-  quad.Draw();
-
-  if (THETA < 2 * PI)
-    THETA += 0.05f;
-  else
-    THETA = 0.1f;
+  first_pass->UseProgram();
+  glm::mat4 mvp = cam->m_proj * cam->m_view * sphere.GetModel();
+  first_pass->SetUniform("mvp", mvp);
+  sphere.Draw();
 }
 
 void DrawScene()
 {
-  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-  GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
-  glDrawBuffers(5, draw_bufs);
+  //glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+  //GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
+  //glDrawBuffers(5, draw_bufs);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glClearColor(0, 0, 0, 1);
@@ -309,13 +226,13 @@ void DrawScene()
   //*/
 
   // deferred pass
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_DEPTH_TEST);
+  //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  //glClearColor(0, 0, 0, 1);
+  //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  //glDisable(GL_DEPTH_TEST);
 
   //* Quad Render with Texture
-  QuadRender();
+  //QuadRender();
   //*/
 }
 

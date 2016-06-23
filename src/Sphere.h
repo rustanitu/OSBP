@@ -12,41 +12,41 @@ class Sphere : public ShaderObject
 {
 public:
 	Sphere(float r = 1, int nsl = 64, int nst = 32);
-  ~Sphere();
+	~Sphere();
 
-  void SetTangentVectors(VertexInfo& v0, VertexInfo& v01, VertexInfo& v2);
+	void SetTangentVectors(VertexInfo& v0, VertexInfo& v01, VertexInfo& v2);
 
-  void TransferData();
-  void ConnectBuffer();
-  void InitDraw() {}
+	void TransferData();
+	void ConnectBuffer();
+	void InitDraw() {}
 	void Draw();
-  void EndDraw() {}
+	void EndDraw() {}
 
-  void SetVertexAttribute(std::string attname, GLuint location, GLenum bufferType);
+	void SetVertexAttribute(std::string attname, GLuint location, GLenum bufferType);
 
-  void SetNormalAttribute(std::string attname, GLuint location, GLenum bufferType);
+	void SetNormalAttribute(std::string attname, GLuint location, GLenum bufferType);
 
-  void SetTextureAttribute(std::string attname, GLuint location, GLenum bufferType);
+	void SetTextureAttribute(std::string attname, GLuint location, GLenum bufferType);
 
-  void SetTangentAttribute(std::string attname, GLuint location, GLenum bufferType);
+	void SetTangentAttribute(std::string attname, GLuint location, GLenum bufferType);
 
-  void SetBitangentAttribute(std::string attname, GLuint location, GLenum bufferType);
+	void SetBitangentAttribute(std::string attname, GLuint location, GLenum bufferType);
 
 private:
 	float *m_vertices;
-  float *m_texcoord;
-  float *m_tangents;
-  float *m_bitangents;
+	float *m_texcoord;
+	float *m_tangents;
+	float *m_bitangents;
 
-  std::string m_vertex;
-  std::string m_normal;
-  std::string m_texture;
-  std::string m_tangent;
-  std::string m_bitangent;
+	std::string m_vertex;
+	std::string m_normal;
+	std::string m_texture;
+	std::string m_tangent;
+	std::string m_bitangent;
 
 	int m_size;
-  int m_indexes_size;
-  GLuint m_idxbuff;
+	int m_indexes_size;
+	GLuint m_idxbuff;
 };
 
 #endif

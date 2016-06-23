@@ -103,5 +103,11 @@
     <None Include="..\src\shaders\lighting_d.frag.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\src\shaders\procedural.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shaders\procedural.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
