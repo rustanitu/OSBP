@@ -90,7 +90,7 @@ void Quad::ConnectBuffer()
   }
 }
 
-void Quad::Draw()
+void Quad::Draw(glm::mat4& inh_model)
 {
   ConnectBuffer();
   glDrawArrays(GL_TRIANGLES, 0, m_size);

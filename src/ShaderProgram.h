@@ -7,6 +7,8 @@
 #include <glm\vec4.hpp>
 #include <glm\mat4x4.hpp>
 
+struct _light;
+
 class ShaderProgram
 {
 public:
@@ -22,7 +24,7 @@ public:
   ~ShaderProgram();
 
   // Link Shader //
-  void LinkProgram();
+  bool LinkProgram();
 
   // Cria programa de shader //
   void CreateShader(const char* filepath, GLenum type);
@@ -76,6 +78,12 @@ public:
     glUniform3fv(id, n, cores);
   }
 
+  void SetUniform(const char* name, GLuint n, float* uniform)
+  {
+    GLuint id = glGetUniformLocation(m_id, name);
+    glUniform3fv(id, n, uniform);
+  }
+
   void SetUniform(const char* name, glm::vec4 uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
@@ -92,10 +100,12 @@ private:
   void Error(const char* err);
 
   // Compile Shader
-  void CompileShader(GLuint id);
+  bool CompileShader(GLuint id);
 
 public:
   GLuint m_id;
+  GLuint m_nshaders;
+  GLuint m_shaders[2];
 };
 
 #endif

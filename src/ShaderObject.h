@@ -6,6 +6,7 @@
 #include <GL\glew.h>
 #include <map>
 
+#include "Material.h"
 #include "Manipulator.h"
 
 class ShaderObject
@@ -13,7 +14,7 @@ class ShaderObject
 public:
   ShaderObject();
 
-  void Init(ShaderProgram* shader);
+  void Init(ShaderProgram* shader, Camera* cam);
 
   ~ShaderObject();
 
@@ -21,24 +22,30 @@ public:
 
   virtual void InitDraw() = 0;
 
-  virtual void Draw() = 0;
+  virtual void Draw(glm::mat4& inh_model = glm::mat4()) = 0;
 
   virtual void EndDraw() = 0;
-
-  void SetManipulatorCamera(Camera* cam)
-  {
-    m_manip->SetCamera(cam);
-  }
 
   Manipulator* GetManipulator()
   {
     return m_manip;
   }
 
-  glm::mat4 GetModel()
+  glm::mat4& GetModel()
   {
     return m_model;
   }
+
+  void SetMaterial(Material* material)
+  {
+    m_material = material;
+  }
+
+  virtual void Translate(float tx, float ty, float tz);
+
+  virtual void Rotate(float angle, float rx, float ry, float rz);
+
+  virtual void Scale(float sx, float sy, float sz);
 
 protected:
   GLuint m_vao;
@@ -48,8 +55,10 @@ protected:
   std::map<std::string, GLuint> m_attributes;
 
 private:
+  Camera* m_cam;
   Manipulator* m_manip;
   glm::mat4 m_model;
+  Material* m_material;
 };
 
 #endif

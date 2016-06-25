@@ -5,6 +5,7 @@
 
 
 ShaderProgram::ShaderProgram()
+: m_nshaders(0)
 {
 }
 
@@ -19,7 +20,7 @@ ShaderProgram::~ShaderProgram()
 {
 }
 
-void ShaderProgram::CompileShader(GLuint id)
+bool ShaderProgram::CompileShader(GLuint id)
 {
   GLint status;
   glCompileShader(id);
@@ -32,10 +33,15 @@ void ShaderProgram::CompileShader(GLuint id)
     glGetShaderInfoLog(id, len, 0, message);
     Error(message);
     free(message);
+    return false;
   }
+
+  m_shaders[m_nshaders] = id;
+  m_nshaders++;
+  return true;
 }
 
-void ShaderProgram::LinkProgram()
+bool ShaderProgram::LinkProgram()
 {
   GLint status;
   glLinkProgram(m_id);
@@ -48,7 +54,13 @@ void ShaderProgram::LinkProgram()
     glGetProgramInfoLog(m_id, len, 0, message);
     Error(message);
     free(message);
+    return false;
   }
+
+  for (int i = 0; i < m_nshaders; ++i)
+    glDetachShader(m_id, i);
+
+  return true;
 }
 
 void ShaderProgram::CreateShader(const char** shader, GLenum type)
@@ -58,8 +70,8 @@ void ShaderProgram::CreateShader(const char** shader, GLenum type)
     Error("Could not create vertex shader object");
 
   glShaderSource(id, 1, shader, 0);
-  CompileShader(id);
-  glAttachShader(m_id, id);
+  if (CompileShader(id))
+    glAttachShader(m_id, id);
 }
 
 void ShaderProgram::CreateShader(const char* filepath, GLenum type)

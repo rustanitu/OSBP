@@ -292,8 +292,19 @@ void Sphere::ConnectBuffer()
   }
 }
 
-void Sphere::Draw()
+void Sphere::InitDraw()
 {
+  ShaderObject::InitDraw();
+}
+
+void Sphere::Draw(glm::mat4& inh_model)
+{
+  ShaderObject::Draw(inh_model);
+  glm::vec3 white = glm::vec3(1, 1, 1);
+  m_shader->SetUniform("amb", white * 0.1f);
+  m_shader->SetUniform("diff", white * 1.0f);
+  m_shader->SetUniform("spec", white * 0.25f);
+  m_shader->SetUniform("shi", 10.0f);
   ConnectBuffer();
   glDrawArrays(GL_TRIANGLES, 0, m_size);
 }

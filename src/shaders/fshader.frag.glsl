@@ -21,7 +21,6 @@ vec3 expand (vec3 v)
 }
 
 out vec3 color;
-out vec3 secondColor;
 void main()
 {
   mat3 rot = transpose(mat3(tangent, bitangent, wrl_normal));
@@ -43,5 +42,4 @@ void main()
   
   // Final Color
   color = amb + mix(cdiff, texture(difftexture, st).rgb, 0.25) + cspec;
-  secondColor = wrl_vLight;
 } 

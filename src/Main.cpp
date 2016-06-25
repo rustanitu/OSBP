@@ -10,6 +10,7 @@
 #include "Manipulator.h"
 #include "ShaderTexture.h"
 #include "Quad.h"
+#include "Group.h"
 
 #include <glm\gtc\matrix_transform.hpp>
 
@@ -55,6 +56,13 @@ glm::vec3 LIGHT_POS[NLIGHTS];
 glm::vec3 LIGHT_SPOT[NLIGHTS];
 glm::vec3 LIGHT_COLORS[NLIGHTS];
 GLfloat THETA = 0;
+
+ShaderProgram* shader = NULL;
+Group* group = NULL;
+Sphere moon;
+Sphere moo;
+ShaderTexture texmoon;
+ShaderTexture texmoon_norm;
 
 void FramebufferInit()
 {
@@ -144,8 +152,8 @@ static void Reshape(int w, int h)
   glViewport(0, 0, w, h);
   cam->SetViewport(w, h);
   cam->SetupCamera();
-  FramebufferFinish();
-  FramebufferInit();
+  //FramebufferFinish();
+  //FramebufferInit();
 }
 
 void Init()
@@ -160,39 +168,44 @@ void Init()
   glutInitContextVersion(4, 5);
   glutInitContextProfile(GLUT_CORE_PROFILE);
 
-  first_pass = new ShaderProgram();
-  first_pass->Init();
-  first_pass->CreateShader("shaders\\repass_d.vert.glsl", GL_VERTEX_SHADER);
-  first_pass->CreateShader("shaders\\repass_d.frag.glsl", GL_FRAGMENT_SHADER);
-  first_pass->LinkProgram();
-
-  second_pass = new ShaderProgram();
-  second_pass->Init();
-  second_pass->CreateShader("shaders\\lighting_d.vert.glsl", GL_VERTEX_SHADER);
-  second_pass->CreateShader("shaders\\lighting_d.frag.glsl", GL_FRAGMENT_SHADER);
-  second_pass->LinkProgram();
+  shader = new ShaderProgram();
+  shader->Init();
+  shader->CreateShader("shaders\\vshader.vert.glsl", GL_VERTEX_SHADER);
+  shader->CreateShader("shaders\\fshader.frag.glsl", GL_FRAGMENT_SHADER);
+  shader->LinkProgram();
   
   cam = new Camera(W, H);
-  cam->SetEye(0, 5, 8);
-  cam->SetAt(0, 0, 2);
+  cam->SetAt(0, 0, 0);
+  cam->SetEye(0, 0, 3);
   cam->SetupCamera();
 
-  blue_sphere.Init(first_pass);
-  blue_sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  blue_sphere.SetNormalAttribute("normal", 1, GL_ARRAY_BUFFER);
-  blue_sphere.TransferData();
+  moon.Init(shader, cam);
+  moon.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  moon.SetNormalAttribute("normal", 1, GL_ARRAY_BUFFER);
+  moon.SetTextureAttribute("texcoord", 2, GL_ARRAY_BUFFER);
+  moon.SetTangentAttribute("tan", 3, GL_ARRAY_BUFFER);
+  moon.SetBitangentAttribute("bitan", 4, GL_ARRAY_BUFFER);
+  moon.TransferData();
+  moon.Translate(3, 1, -2);
+  Manipulator::SetCurrent(moon.GetManipulator());
+
+  moo.Init(shader, cam);
+  moo.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  moo.SetNormalAttribute("normal", 1, GL_ARRAY_BUFFER);
+  moo.SetTextureAttribute("texcoord", 2, GL_ARRAY_BUFFER);
+  moo.SetTangentAttribute("tan", 3, GL_ARRAY_BUFFER);
+  moo.SetBitangentAttribute("bitan", 4, GL_ARRAY_BUFFER);
+  moo.TransferData();
+
+  texmoon.Init("..\\textures\\moon.bmp");
+  texmoon_norm.Init("..\\textures\\moonnorm.bmp");
+
+  group = new Group();
+  group->Init(shader, cam);
+  group->AddChild(&moon);
+  group->AddChild(&moo);
   
-  quad.Init(second_pass);
-  quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  quad.SetTextureAttribute("texcoord", 1, GL_ARRAY_BUFFER);
-  quad.TransferData();
-
-  for (GLuint i = 0; i < NLIGHTS; ++i)
-  {
-    LIGHT_COLORS[i] = COLORS[rand() % 7];
-  }
-
-  FramebufferInit();
+  //FramebufferInit();
 }
 
 void BlueSphereRender(glm::mat4 t)
@@ -208,6 +221,43 @@ void BlueSphereRender(glm::mat4 t)
   first_pass->SetUniform("mspec", WHITE * 0.6f);
   first_pass->SetUniform("mshi", 128.0f);
   blue_sphere.Draw();
+}
+
+void DrawScene()
+{
+  //shader->UseProgram();
+  //glm::mat4 model = moon.GetModel();
+  //glm::mat4 mvp = cam->m_proj * cam->m_view * model;
+
+  //shader->SetUniform("mvp", mvp);
+  //shader->SetUniform("model", model);
+  //shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
+
+  //shader->SetUniform("light", glm::vec3(-5, 0, 0));
+  //shader->SetUniform("eye", cam->GetEye());
+
+  //glm::vec3 white = glm::vec3(1, 1, 1);
+  //shader->SetUniform("amb", white * 0.1f);
+  //shader->SetUniform("diff", white * 1.0f);
+  //shader->SetUniform("spec", white * 0.25f);
+  //shader->SetUniform("shi", 10.0f);
+
+  //texmoon_norm.LoadTexture();
+  //shader->SetUniform("normtexture", texmoon_norm.m_id);
+  //texmoon.LoadTexture();
+  //shader->SetUniform("difftexture", texmoon.m_id);
+
+  //moon.Draw();
+
+  //model = moo.GetModel();
+  //mvp = cam->m_proj * cam->m_view * model;
+
+  //shader->SetUniform("mvp", mvp);
+  //shader->SetUniform("model", model);
+  //shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
+  //moo.Draw();
+  group->Translate(0, 0, -0.05);
+  group->Draw();
 }
 
 void SceneRender()
@@ -293,7 +343,7 @@ void QuadRender()
     THETA = 0.1f;
 }
 
-void DrawScene()
+void DeferredDrawScene(/*Incluir ponteiro para funções*/)
 {
   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
   GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
@@ -305,7 +355,7 @@ void DrawScene()
 
 
   //* Scene Render
-  SceneRender();
+  SceneRender(); // Transformar em uma chama para ponteiro de função passado por parametro
   //*/
 
   // deferred pass
@@ -315,14 +365,16 @@ void DrawScene()
   glDisable(GL_DEPTH_TEST);
 
   //* Quad Render with Texture
-  QuadRender();
+  QuadRender(); // Transformar em uma chama para ponteiro de função passado por parametro
   //*/
 }
 
 // Display callback
 static void Display(void)
 {
+  glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   // draw scene
   DrawScene();

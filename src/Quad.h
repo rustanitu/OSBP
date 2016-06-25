@@ -15,7 +15,7 @@ public:
   void TransferData();
   void ConnectBuffer();
   void InitDraw() {}
-	void Draw();
+  void Draw(glm::mat4& inh_model = glm::mat4());
   void EndDraw() {}
 
   void SetVertexAttribute(std::string attname, GLuint location, GLenum bufferType);
