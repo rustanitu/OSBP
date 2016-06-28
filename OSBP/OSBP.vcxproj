@@ -27,6 +27,7 @@
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\Manipulator.cpp" />
     <ClCompile Include="..\src\Material.cpp" />
+    <ClCompile Include="..\src\PerlinNoise.cpp" />
     <ClCompile Include="..\src\Quad.cpp" />
     <ClCompile Include="..\src\ShaderObject.cpp" />
     <ClCompile Include="..\src\ShaderProgram.cpp" />

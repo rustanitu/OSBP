@@ -11,5 +11,5 @@ void main()
   gl_Position = vec4(vertex, 1.0f);
   vert = vertex * 0.5;
   vert += 0.5;
-  vert.z = slice / (size-1);
+  vert.z = float(slice) / float(size-1);
 }

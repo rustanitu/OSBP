@@ -1,7 +1,6 @@
 #version 450
 
 in vec3 vertex;
-in vec2 texcoord;
 
 uniform mat4 mv;
 uniform mat4 mvp;
@@ -14,5 +13,4 @@ void main()
   gl_Position = mvp * vert;
   wrl_pos = vertex * 0.5;
   wrl_pos += vec3(0.5);
-  st = texcoord;
 }

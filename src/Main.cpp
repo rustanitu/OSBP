@@ -51,16 +51,17 @@ void FramebufferInit()
   glGenFramebuffers(1, &framebuffer);
   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
+  glEnable(GL_TEXTURE_3D);
 
   // Vertex Texture Init
   glGenTextures(1, &noise_buff);
   glBindTexture(GL_TEXTURE_3D, noise_buff);
-  glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB32F, B_SIZE, B_SIZE, B_SIZE, 0, GL_RGB, GL_FLOAT, NULL);
+  glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB32F, B_SIZE, B_SIZE, B_SIZE, 0, GL_RGBA, GL_FLOAT, PerlinNoise::Generate3DTexture(B_SIZE));
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   // Attach Texture and FrameBuffer
-  //glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D, noise_buff, 0);
+  //glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D, noise_buff, 0, 0);
 }
 
 void FramebufferFinish()
@@ -124,34 +125,9 @@ void Init()
   reveal.Init(second_pass, cam);
   reveal.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
   reveal.TransferData();
-  Manipulator::SetCurrent(reveal.GetManipulator());
+  //Manipulator::SetCurrent(reveal.GetManipulator());
 
   FramebufferInit();
-
-  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-  GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0 };
-  glDrawBuffers(1, draw_bufs);
-
-  glViewport(0, 0, B_SIZE, B_SIZE);
-  first_pass->UseProgram();
-
-  for (int i = 0; i < B_SIZE; i++)
-  {
-    // Attach Texture and FrameBuffer
-    glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D, noise_buff, 0, i);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0, 0, 0, 1);
-    glEnable(GL_DEPTH_TEST);
-
-    first_pass->SetUniform("permutations", PerlinNoise::P_SIZE, PerlinNoise::PERMUTATIONS);
-    first_pass->SetUniform("size", B_SIZE);
-    first_pass->SetUniform("slice", i);
-    quad.Draw();
-    //*/
-  }
-
-  glViewport(0, 0, W, H);
 }
 
 void DeferredDrawScene(/*Incluir ponteiro para funções*/)
@@ -169,11 +145,11 @@ void DeferredDrawScene(/*Incluir ponteiro para funções*/)
   glBindTexture(GL_TEXTURE_3D, noise_buff);
   second_pass->SetUniform("noise_tex", noise_buff);
 
-  glm::mat4 mv = cam->m_view * reveal.GetModel();
+  glm::mat4 mv = cam->m_view * sphere.GetModel();
   glm::mat4 mvp = cam->m_proj * mv;
   second_pass->SetUniform("mv", mv);
   second_pass->SetUniform("mvp", mvp);
-  reveal.Draw();
+  sphere.Draw();
 
   //*/
 }
