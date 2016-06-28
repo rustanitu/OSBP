@@ -5,34 +5,28 @@
 
 #include "Camera.h"
 #include "ShaderProgram.h"
-#include "Triangle.h"
 #include "Sphere.h"
 #include "Manipulator.h"
-#include "ShaderTexture.h"
 #include "Quad.h"
-#include "Group.h"
+#include "Cube.h"
+#include "PerlinNoise.h"
 
 #include <glm\gtc\matrix_transform.hpp>
 
-#define PI 3.14159265359
-
 int W = 800;
 int H = 600;
+int B_SIZE = 150;
 Camera* cam = NULL;
 Manipulator* manip = NULL;
 Sphere sphere;
-//Quad quad;
+Quad quad;
+Quad reveal;
 
 GLuint framebuffer;
-GLuint vertex_buff;
-GLuint normal_buff;
-GLuint amb_buff;
-GLuint diff_buff;
-GLuint spec_buff;
-GLuint depthbuffer;
+GLuint noise_buff;
 
 ShaderProgram* first_pass = NULL;
-//ShaderProgram* second_pass = NULL;
+ShaderProgram* second_pass = NULL;
 
 const glm::vec3 WHITE(1.0f, 1.0f, 1.0f);
 const glm::vec3 RED(1.0f, 0.0f, 0.0f);
@@ -59,76 +53,21 @@ void FramebufferInit()
 
 
   // Vertex Texture Init
-  glGenTextures(1, &vertex_buff);
-  glBindTexture(GL_TEXTURE_2D, vertex_buff);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, W, H, 0, GL_RGB, GL_FLOAT, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glGenTextures(1, &noise_buff);
+  glBindTexture(GL_TEXTURE_3D, noise_buff);
+  glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB32F, B_SIZE, B_SIZE, B_SIZE, 0, GL_RGB, GL_FLOAT, NULL);
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   // Attach Texture and FrameBuffer
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, vertex_buff, 0);
-
-
-  // Normal Texture Init
-  glGenTextures(1, &normal_buff);
-  glBindTexture(GL_TEXTURE_2D, normal_buff);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, W, H, 0, GL_RGB, GL_FLOAT, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // Attach Texture and FrameBuffer
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normal_buff, 0);
-
-
-  // Ambient Texture Init
-  glGenTextures(1, &amb_buff);
-  glBindTexture(GL_TEXTURE_2D, amb_buff);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, W, H, 0, GL_RGB, GL_FLOAT, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // Attach Texture and FrameBuffer
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, amb_buff, 0);
-
-
-  // Diffuse Texture Init
-  glGenTextures(1, &diff_buff);
-  glBindTexture(GL_TEXTURE_2D, diff_buff);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, W, H, 0, GL_RGB, GL_FLOAT, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // Attach Texture and FrameBuffer
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, diff_buff, 0);
-
-
-  // Specular Texture Init
-  glGenTextures(1, &spec_buff);
-  glBindTexture(GL_TEXTURE_2D, spec_buff);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // Attach Texture and FrameBuffer
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, spec_buff, 0);
-
-
-  // Depth Init
-  glGenRenderbuffers(1, &depthbuffer);
-  glBindRenderbuffer(GL_RENDERBUFFER, depthbuffer);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, W, H);
-
-
-  // Attach Depth
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthbuffer);
+  //glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D, noise_buff, 0);
 }
 
 void FramebufferFinish()
 {
   //* FrameBuffer Finish
   glDeleteFramebuffers(1, &framebuffer);
-  glDeleteTextures(1, &vertex_buff);
-  glDeleteRenderbuffers(1, &depthbuffer);
+  glDeleteTextures(1, &noise_buff);
 }
 
 // Reshape callback
@@ -157,117 +96,85 @@ void Init()
 
   first_pass = new ShaderProgram();
   first_pass->Init();
-  first_pass->CreateShader("shaders\\procedural.vert.glsl", GL_VERTEX_SHADER);
-  first_pass->CreateShader("shaders\\procedural.frag.glsl", GL_FRAGMENT_SHADER);
+  first_pass->CreateShader("shaders\\noise.vert.glsl", GL_VERTEX_SHADER);
+  first_pass->CreateShader("shaders\\noise.frag.glsl", GL_FRAGMENT_SHADER);
   first_pass->LinkProgram();
 
-  //second_pass = new ShaderProgram();
-  //second_pass->Init();
-  //second_pass->CreateShader("shaders\\lighting_d.vert.glsl", GL_VERTEX_SHADER);
-  //second_pass->CreateShader("shaders\\lighting_d.frag.glsl", GL_FRAGMENT_SHADER);
-  //second_pass->LinkProgram();
+  second_pass = new ShaderProgram();
+  second_pass->Init();
+  second_pass->CreateShader("shaders\\procedural.vert.glsl", GL_VERTEX_SHADER);
+  second_pass->CreateShader("shaders\\procedural.frag.glsl", GL_FRAGMENT_SHADER);
+  second_pass->LinkProgram();
   
   cam = new Camera(W, H);
   cam->SetEye(0, 0, 3);
   cam->SetAt(0, 0, 0);
   cam->SetupCamera();
 
-  sphere.Init(first_pass, cam);
+  sphere.Init(second_pass, cam);
   sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
   sphere.SetTextureAttribute("texcoord", 1, GL_ARRAY_BUFFER);
   sphere.TransferData();
   Manipulator::SetCurrent(sphere.GetManipulator());
 
-  
-  //quad.Init(first_pass);
-  //quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  //quad.SetTextureAttribute("texcoord", 1, GL_ARRAY_BUFFER);
-  //quad.TransferData();
+  quad.Init(first_pass, cam);
+  quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  quad.TransferData();
 
-  //FramebufferInit();
-}
+  reveal.Init(second_pass, cam);
+  reveal.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  reveal.TransferData();
+  Manipulator::SetCurrent(reveal.GetManipulator());
 
-void BlueSphereRender(glm::mat4 t)
-{
+  FramebufferInit();
+
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+  GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0 };
+  glDrawBuffers(1, draw_bufs);
+
+  glViewport(0, 0, B_SIZE, B_SIZE);
   first_pass->UseProgram();
-  glm::mat4 mvp = cam->m_proj * cam->m_view * t;
-  first_pass->SetUniform("mvp", mvp);
-  first_pass->SetUniform("m", t);
-  first_pass->SetUniform("_m", glm::transpose(glm::inverse(t)));
 
-  first_pass->SetUniform("mamb", RED * 0.2f);
-  first_pass->SetUniform("mdiff", WHITE * 0.3f);
-  first_pass->SetUniform("mspec", WHITE * 0.6f);
-  first_pass->SetUniform("mshi", 128.0f);
-  sphere.Draw();
-}
+  for (int i = 0; i < B_SIZE; i++)
+  {
+    // Attach Texture and FrameBuffer
+    glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D, noise_buff, 0, i);
 
-void DrawScene()
-{
-  //shader->UseProgram();
-  //glm::mat4 model = moon.GetModel();
-  //glm::mat4 mvp = cam->m_proj * cam->m_view * model;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0, 0, 0, 1);
+    glEnable(GL_DEPTH_TEST);
 
-  //shader->SetUniform("mvp", mvp);
-  //shader->SetUniform("model", model);
-  //shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
+    first_pass->SetUniform("permutations", PerlinNoise::P_SIZE, PerlinNoise::PERMUTATIONS);
+    first_pass->SetUniform("size", B_SIZE);
+    first_pass->SetUniform("slice", i);
+    quad.Draw();
+    //*/
+  }
 
-  //shader->SetUniform("light", glm::vec3(-5, 0, 0));
-  //shader->SetUniform("eye", cam->GetEye());
-
-  //glm::vec3 white = glm::vec3(1, 1, 1);
-  //shader->SetUniform("amb", white * 0.1f);
-  //shader->SetUniform("diff", white * 1.0f);
-  //shader->SetUniform("spec", white * 0.25f);
-  //shader->SetUniform("shi", 10.0f);
-
-  //texmoon_norm.LoadTexture();
-  //shader->SetUniform("normtexture", texmoon_norm.m_id);
-  //texmoon.LoadTexture();
-  //shader->SetUniform("difftexture", texmoon.m_id);
-
-  //moon.Draw();
-
-  //model = moo.GetModel();
-  //mvp = cam->m_proj * cam->m_view * model;
-
-  //shader->SetUniform("mvp", mvp);
-  //shader->SetUniform("model", model);
-  //shader->SetUniform("tinv_model", glm::transpose(glm::inverse(model)));
-  //moo.Draw();
-}
-
-void SceneRender()
-{
-  first_pass->UseProgram();
-  glm::mat4 mvp = cam->m_proj * cam->m_view * sphere.GetModel();
-  first_pass->SetUniform("mvp", mvp);
-  sphere.Draw();
+  glViewport(0, 0, W, H);
 }
 
 void DeferredDrawScene(/*Incluir ponteiro para funções*/)
 {
-  //glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-  //GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
-  //glDrawBuffers(5, draw_bufs);
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glClearColor(0, 0, 0, 1);
-  glEnable(GL_DEPTH_TEST);
-
-
-  //* Scene Render
-  SceneRender(); // Transformar em uma chama para ponteiro de função passado por parametro
-  //*/
-
   // deferred pass
-  //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  //glClearColor(0, 0, 0, 1);
-  //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  //glDisable(GL_DEPTH_TEST);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glDisable(GL_DEPTH_TEST);
 
   //* Quad Render with Texture
-  //QuadRender();
+  second_pass->UseProgram();
+
+  glActiveTexture(GL_TEXTURE0 + noise_buff);
+  glBindTexture(GL_TEXTURE_3D, noise_buff);
+  second_pass->SetUniform("noise_tex", noise_buff);
+
+  glm::mat4 mv = cam->m_view * reveal.GetModel();
+  glm::mat4 mvp = cam->m_proj * mv;
+  second_pass->SetUniform("mv", mv);
+  second_pass->SetUniform("mvp", mvp);
+  reveal.Draw();
+
   //*/
 }
 
@@ -279,7 +186,7 @@ static void Display(void)
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   // draw scene
-  SceneRender();
+  DeferredDrawScene();
   
   glutSwapBuffers();
   glutPostRedisplay();

@@ -51,6 +51,9 @@
     <ClCompile Include="..\src\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Camera.h">
@@ -89,6 +92,12 @@
     <ClInclude Include="..\src\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PerlinNoise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\vshader.vert.glsl">
@@ -125,6 +134,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\src\shaders\procedural.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shaders\noise.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shaders\noise.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

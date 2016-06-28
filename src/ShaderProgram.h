@@ -40,57 +40,55 @@ public:
     glUseProgram(m_id);
   }
 
-  void SetUniform(const char* name, GLuint uniform)
+  void SetUniform(const char* name, const GLuint& uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
     glUniform1i(id, uniform);
   }
 
-  void SetUniform(const char* name, int uniform)
+  void SetUniform(const char* name, const int& uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
     glUniform1i(id, uniform);
   }
 
-  void SetUniform(const char* name, float uniform)
+  void SetUniform(const char* name, const float& uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
     glUniform1f(id, uniform);
   }
 
-  void SetUniform(const char* name, glm::vec3 uniform)
+  void SetUniform(const char* name, const glm::vec3& uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
     glUniform3fv(id, 1, &uniform[0]);
   }
 
-  void SetUniform(const char* name, GLuint n, glm::vec3* uniform)
+  void SetUniform(const char* name, GLuint n, const glm::vec3* uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
-    float* cores = new float[n*3];
-    int j = 0;
-    for (int i = 0; i < n; i++)
-    {
-      cores[j++] = uniform[i].x;
-      cores[j++] = uniform[i].y;
-      cores[j++] = uniform[i].z;
-    }
-    glUniform3fv(id, n, cores);
+    glUniform3fv(id, n, &uniform[0][0]);
   }
 
-  void SetUniform(const char* name, GLuint n, float* uniform)
+  void SetUniform(const char* name, GLuint n, const int* uniform)
+  {
+    GLuint id = glGetUniformLocation(m_id, name);
+    glUniform1iv(id, n, &uniform[0]);
+  }
+
+  void SetUniform(const char* name, GLuint n, const float* uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
     glUniform3fv(id, n, uniform);
   }
 
-  void SetUniform(const char* name, glm::vec4 uniform)
+  void SetUniform(const char* name, const glm::vec4& uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
     glUniform4fv(id, 1, &uniform[0]);
   }
 
-  void SetUniform(const char* name, glm::mat4 uniform)
+  void SetUniform(const char* name, const glm::mat4& uniform)
   {
     GLuint id = glGetUniformLocation(m_id, name);
     glUniformMatrix4fv(id, 1, GL_FALSE, &uniform[0][0]);
