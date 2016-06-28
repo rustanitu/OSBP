@@ -81,6 +81,34 @@ float* PerlinNoise::Generate3DTexture(int dimension)
   return noise;
 }
 
+float* PerlinNoise::Generate2DTexture(int dimension)
+{
+  int size = dimension * dimension * 4;
+  float* noise = new float[size];
+
+  float dim = float(dimension);
+
+  int count = 0;
+  for (int j = 0; j < dimension; ++j) {
+    float y = j / dim;
+    for (int i = 0; i < dimension; ++i) {
+      float x = i / dim;
+      glm::vec3 pos(x, y, 0);
+      float r = Noise(pos, 4, 128);
+      float g = Noise(pos, 8, 64);
+      float b = Noise(pos, 224, 2);
+      float a = Noise(pos, 255, 2);
+
+      noise[count++] = r;
+      noise[count++] = g;
+      noise[count++] = b;
+      noise[count++] = a;
+    }
+  }
+
+  return noise;
+}
+
 float PerlinNoise::Fade(float t)
 {
   return t * t * t * (t * (t * 6 - 15) + 10);
@@ -147,7 +175,7 @@ float PerlinNoise::Perlin(glm::vec3 pos)
   y2 = Lerp(x1, x2, v);
 
   float rand = Lerp(y1, y2, w);
-  return (rand * 0.5) + 0.5;
+  return rand;// (rand * 0.5) + 0.5;
 }
 
 float PerlinNoise::Noise(glm::vec3 pos, float frequency, float amplitude)

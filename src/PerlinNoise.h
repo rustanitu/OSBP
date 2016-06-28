@@ -7,6 +7,7 @@ class PerlinNoise
 {
 public:
   static float* Generate3DTexture(int dimension);
+  static float* Generate2DTexture(int dimension);
 
 private:
   static float Fade(float t);

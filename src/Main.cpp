@@ -15,18 +15,18 @@
 
 int W = 800;
 int H = 600;
-int B_SIZE = 150;
 Camera* cam = NULL;
 Manipulator* manip = NULL;
 Sphere sphere;
-Quad quad;
-Quad reveal;
+Quad quad(5);
 
-GLuint framebuffer;
-GLuint noise_buff;
+GLuint planet_noise_buff;
+GLuint planet_noise_buff_size = 200;
+GLuint sky_noise_buff;
+GLuint sky_noise_buff_size = 600;
 
-ShaderProgram* first_pass = NULL;
-ShaderProgram* second_pass = NULL;
+ShaderProgram* planet_shader = NULL;
+ShaderProgram* sky_shader = NULL;
 
 const glm::vec3 WHITE(1.0f, 1.0f, 1.0f);
 const glm::vec3 RED(1.0f, 0.0f, 0.0f);
@@ -45,32 +45,6 @@ const glm::vec3 COLORS[7] =
   CYAN
 };
 
-void FramebufferInit()
-{
-  //* FrameBuffer Init
-  glGenFramebuffers(1, &framebuffer);
-  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-  glEnable(GL_TEXTURE_3D);
-
-  // Vertex Texture Init
-  glGenTextures(1, &noise_buff);
-  glBindTexture(GL_TEXTURE_3D, noise_buff);
-  glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB32F, B_SIZE, B_SIZE, B_SIZE, 0, GL_RGBA, GL_FLOAT, PerlinNoise::Generate3DTexture(B_SIZE));
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // Attach Texture and FrameBuffer
-  //glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D, noise_buff, 0, 0);
-}
-
-void FramebufferFinish()
-{
-  //* FrameBuffer Finish
-  glDeleteFramebuffers(1, &framebuffer);
-  glDeleteTextures(1, &noise_buff);
-}
-
 // Reshape callback
 static void Reshape(int w, int h)
 {
@@ -79,8 +53,6 @@ static void Reshape(int w, int h)
   glViewport(0, 0, w, h);
   cam->SetViewport(w, h);
   cam->SetupCamera();
-  //FramebufferFinish();
-  //FramebufferInit();
 }
 
 void Init()
@@ -95,63 +67,60 @@ void Init()
   glutInitContextVersion(4, 5);
   glutInitContextProfile(GLUT_CORE_PROFILE);
 
-  first_pass = new ShaderProgram();
-  first_pass->Init();
-  first_pass->CreateShader("shaders\\noise.vert.glsl", GL_VERTEX_SHADER);
-  first_pass->CreateShader("shaders\\noise.frag.glsl", GL_FRAGMENT_SHADER);
-  first_pass->LinkProgram();
+  glEnable(GL_TEXTURE_3D);
+  glGenTextures(1, &planet_noise_buff);
+  glBindTexture(GL_TEXTURE_3D, planet_noise_buff);
+  glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA32F, planet_noise_buff_size, planet_noise_buff_size, planet_noise_buff_size, 0, GL_RGBA, GL_FLOAT, PerlinNoise::Generate3DTexture(planet_noise_buff_size));
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  second_pass = new ShaderProgram();
-  second_pass->Init();
-  second_pass->CreateShader("shaders\\procedural.vert.glsl", GL_VERTEX_SHADER);
-  second_pass->CreateShader("shaders\\procedural.frag.glsl", GL_FRAGMENT_SHADER);
-  second_pass->LinkProgram();
+  glEnable(GL_TEXTURE_2D);
+  glGenTextures(1, &sky_noise_buff);
+  glBindTexture(GL_TEXTURE_2D, sky_noise_buff);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, sky_noise_buff_size, sky_noise_buff_size, 0, GL_RGBA, GL_FLOAT, PerlinNoise::Generate2DTexture(sky_noise_buff_size));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  planet_shader = new ShaderProgram();
+  planet_shader->Init();
+  planet_shader->CreateShader("shaders\\planet.vert.glsl", GL_VERTEX_SHADER);
+  planet_shader->CreateShader("shaders\\planet.frag.glsl", GL_FRAGMENT_SHADER);
+  planet_shader->LinkProgram();
+
+  sky_shader = new ShaderProgram();
+  sky_shader->Init();
+  sky_shader->CreateShader("shaders\\sky.vert.glsl", GL_VERTEX_SHADER);
+  sky_shader->CreateShader("shaders\\sky.frag.glsl", GL_FRAGMENT_SHADER);
+  sky_shader->LinkProgram();
   
   cam = new Camera(W, H);
   cam->SetEye(0, 0, 3);
   cam->SetAt(0, 0, 0);
   cam->SetupCamera();
 
-  sphere.Init(second_pass, cam);
+  sphere.Init(planet_shader, cam);
   sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  sphere.SetTextureAttribute("texcoord", 1, GL_ARRAY_BUFFER);
   sphere.TransferData();
   Manipulator::SetCurrent(sphere.GetManipulator());
 
-  quad.Init(first_pass, cam);
+  quad.Init(sky_shader, cam);
   quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
   quad.TransferData();
-
-  reveal.Init(second_pass, cam);
-  reveal.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  reveal.TransferData();
-  //Manipulator::SetCurrent(reveal.GetManipulator());
-
-  FramebufferInit();
+  Manipulator::SetCurrent(quad.GetManipulator());
 }
 
-void DeferredDrawScene(/*Incluir ponteiro para funções*/)
+void RenderScene()
 {
-  // deferred pass
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_DEPTH_TEST);
+  sky_shader->UseProgram();
 
-  //* Quad Render with Texture
-  second_pass->UseProgram();
+  glActiveTexture(GL_TEXTURE0 + sky_noise_buff);
+  glBindTexture(GL_TEXTURE_2D, sky_noise_buff);
+  sky_shader->SetUniform("noise_tex", sky_noise_buff);
 
-  glActiveTexture(GL_TEXTURE0 + noise_buff);
-  glBindTexture(GL_TEXTURE_3D, noise_buff);
-  second_pass->SetUniform("noise_tex", noise_buff);
-
-  glm::mat4 mv = cam->m_view * sphere.GetModel();
+  glm::mat4 mv = cam->m_view * quad.GetModel();
   glm::mat4 mvp = cam->m_proj * mv;
-  second_pass->SetUniform("mv", mv);
-  second_pass->SetUniform("mvp", mvp);
-  sphere.Draw();
-
-  //*/
+  sky_shader->SetUniform("mvp", mvp);
+  quad.Draw();
 }
 
 // Display callback
@@ -159,10 +128,11 @@ static void Display(void)
 {
   glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  //glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   // draw scene
-  DeferredDrawScene();
+  RenderScene();
   
   glutSwapBuffers();
   glutPostRedisplay();
@@ -178,7 +148,7 @@ int main (int argc, char* argv[])
   glutInitWindowSize(W, H);
 
   // create window
-  glutCreateWindow("Deferred Shading");
+  glutCreateWindow("Noise");
   glutReshapeFunc(Reshape);
   glutDisplayFunc(Display);
 

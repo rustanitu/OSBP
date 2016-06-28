@@ -55,14 +55,14 @@
     <None Include="..\src\shaders\fshader.frag.glsl" />
     <None Include="..\src\shaders\lighting_d.frag.glsl" />
     <None Include="..\src\shaders\lighting_d.vert.glsl" />
-    <None Include="..\src\shaders\procedural.frag.glsl" />
-    <None Include="..\src\shaders\procedural.vert.glsl" />
-    <None Include="..\src\shaders\noise.frag.glsl" />
-    <None Include="..\src\shaders\noise.vert.glsl" />
+    <None Include="..\src\shaders\planet.frag.glsl" />
+    <None Include="..\src\shaders\planet.vert.glsl" />
     <None Include="..\src\shaders\quad.frag.glsl" />
     <None Include="..\src\shaders\quad.vert.glsl" />
     <None Include="..\src\shaders\repass_d.frag.glsl" />
     <None Include="..\src\shaders\repass_d.vert.glsl" />
+    <None Include="..\src\shaders\sky.frag.glsl" />
+    <None Include="..\src\shaders\sky.vert.glsl" />
     <None Include="..\src\shaders\vshader.vert.glsl" />
     <None Include="..\src\shaders\world.vert.glsl" />
   </ItemGroup>
