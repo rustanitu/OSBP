@@ -20,6 +20,7 @@ Manipulator* manip = NULL;
 Sphere sphere;
 Quad quad(5);
 static float s_time = 0.7;
+static float s_delta = 0.005;
 
 GLuint planet_noise_buff;
 GLuint planet_noise_buff_size = 300;
@@ -155,9 +156,11 @@ static void Display(void)
 
 void TimeStep(int val)
 {
-  s_time += 0.005;
-  if (s_time > 1.0f)
-    s_time -= 0.3f;
+  s_time += s_delta;
+
+  if (s_time > 1.0f || s_time < 0.7)
+    s_delta = -s_delta;
+
   glutTimerFunc(val, TimeStep, val);
 }
 
@@ -177,7 +180,7 @@ int main (int argc, char* argv[])
 
   // initiate OpenGL context
   Init();
-  int val = 75;
+  int val = 100;
   glutTimerFunc(val, TimeStep, val);
 
   // interact...
