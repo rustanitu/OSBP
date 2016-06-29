@@ -8,15 +8,14 @@ out vec3 color;
 void main()
 {
   vec4 tex = texture(noise_tex, vert.xy);
-  //color = vec3(tex.a / 32);
-  //return;
-  //color = vec3((tex.r + tex.g + tex.b + tex.a) / 236);
   vec3 blueStars = vec3(tex.a) - vec3(1);
   blueStars *= vec3(1,1,1.5);
   blueStars = clamp(blueStars, 0, 1);
   vec3 planets = vec3(tex.b) - vec3(1.5);
   planets *= vec3(5,3,1);
   planets = clamp(planets, 0, 1);
+
+  color = blueStars + planets; return;
   
   vec3 clouds = vec3(tex.r + tex.g) / 192;
   clouds *= 0.5;

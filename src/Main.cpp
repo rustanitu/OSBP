@@ -19,9 +19,10 @@ Camera* cam = NULL;
 Manipulator* manip = NULL;
 Sphere sphere;
 Quad quad(5);
+static float s_time = 0.7;
 
 GLuint planet_noise_buff;
-GLuint planet_noise_buff_size = 200;
+GLuint planet_noise_buff_size = 300;
 GLuint sky_noise_buff;
 GLuint sky_noise_buff_size = 600;
 
@@ -50,6 +51,10 @@ static void Reshape(int w, int h)
 {
   W = w;
   H = h;
+  quad = Quad(W);
+  quad.Init(sky_shader, cam);
+  quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  quad.TransferData();
   glViewport(0, 0, w, h);
   cam->SetViewport(w, h);
   cam->SetupCamera();
@@ -94,7 +99,7 @@ void Init()
   sky_shader->LinkProgram();
   
   cam = new Camera(W, H);
-  cam->SetEye(0, 0, 3);
+  cam->SetEye(0, 0, 6);
   cam->SetAt(0, 0, 0);
   cam->SetupCamera();
 
@@ -106,7 +111,7 @@ void Init()
   quad.Init(sky_shader, cam);
   quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
   quad.TransferData();
-  Manipulator::SetCurrent(quad.GetManipulator());
+  //Manipulator::SetCurrent(quad.GetManipulator());
 }
 
 void RenderScene()
@@ -117,10 +122,21 @@ void RenderScene()
   glBindTexture(GL_TEXTURE_2D, sky_noise_buff);
   sky_shader->SetUniform("noise_tex", sky_noise_buff);
 
-  glm::mat4 mv = cam->m_view * quad.GetModel();
-  glm::mat4 mvp = cam->m_proj * mv;
+  glm::mat4 mvp = cam->m_proj * cam->m_view * quad.GetModel();
   sky_shader->SetUniform("mvp", mvp);
+  sky_shader->SetUniform("size", (float)5);
   quad.Draw();
+
+  planet_shader->UseProgram();
+
+  glActiveTexture(GL_TEXTURE0 + planet_noise_buff);
+  glBindTexture(GL_TEXTURE_3D, planet_noise_buff);
+  planet_shader->SetUniform("noise_tex", planet_noise_buff);
+
+  mvp = cam->m_proj * cam->m_view * sphere.GetModel();
+  planet_shader->SetUniform("mvp", mvp);
+  planet_shader->SetUniform("time", s_time);
+  sphere.Draw();
 }
 
 // Display callback
@@ -128,7 +144,6 @@ static void Display(void)
 {
   glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  //glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   // draw scene
@@ -136,6 +151,14 @@ static void Display(void)
   
   glutSwapBuffers();
   glutPostRedisplay();
+}
+
+void TimeStep(int val)
+{
+  s_time += 0.005;
+  if (s_time > 1.0f)
+    s_time -= 0.3f;
+  glutTimerFunc(val, TimeStep, val);
 }
 
 // Main function
@@ -154,6 +177,8 @@ int main (int argc, char* argv[])
 
   // initiate OpenGL context
   Init();
+  int val = 75;
+  glutTimerFunc(val, TimeStep, val);
 
   // interact...
   glutMainLoop();
