@@ -6,11 +6,14 @@
 class PerlinNoise
 {
 public:
+  static float* GenerateTurbulence(int dimension);
   static float* Generate3DTexture(int dimension);
   static float* Generate2DTexture(int dimension);
 
 private:
   static float Fade(float t);
+
+  static float Turbulence(glm::vec3 p);
 
   static float Grad(int hash, float x, float y, float z);
 

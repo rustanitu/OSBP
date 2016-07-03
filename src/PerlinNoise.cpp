@@ -1,5 +1,7 @@
 #include "PerlinNoise.h"
 
+#include <math.h>
+
 const int PerlinNoise::size = 512;
 const int PerlinNoise::permutations[512] = 
 {
@@ -81,6 +83,32 @@ float* PerlinNoise::Generate3DTexture(int dimension)
   return noise;
 }
 
+float* PerlinNoise::GenerateTurbulence(int dimension)
+{
+  int size = dimension * dimension * dimension;
+  float* noise = new float[size];
+
+  float dim = float(dimension);
+
+  int count = 0;
+  for (int k = 0; k < dimension; ++k)
+  {
+    float z = k / dim;
+    for (int j = 0; j < dimension; ++j)
+    {
+      float y = j / dim;
+      for (int i = 0; i < dimension; ++i)
+      {
+        float x = i / dim;
+        glm::vec3 pos(x, y, z);
+        noise[count++] = Turbulence(pos);
+      }
+    }
+  }
+
+  return noise;
+}
+
 float* PerlinNoise::Generate2DTexture(int dimension)
 {
   int size = dimension * dimension * 4;
@@ -96,8 +124,8 @@ float* PerlinNoise::Generate2DTexture(int dimension)
       glm::vec3 pos(x, y, 0);
       float r = Noise(pos, 4, 128);
       float g = Noise(pos, 8, 64);
-      float b = Noise(pos, 224, 2);
-      float a = Noise(pos, 255, 2);
+      float b = Noise(pos, 240, 2);
+      float a = Noise(pos, 254, 1);
 
       noise[count++] = r;
       noise[count++] = g;
@@ -175,10 +203,23 @@ float PerlinNoise::Perlin(glm::vec3 pos)
   y2 = Lerp(x1, x2, v);
 
   float rand = Lerp(y1, y2, w);
-  return rand;// (rand * 0.5) + 0.5;
+  return rand;
 }
 
 float PerlinNoise::Noise(glm::vec3 pos, float frequency, float amplitude)
 {
   return Perlin(pos * frequency) * amplitude;
+}
+
+float PerlinNoise::Turbulence(glm::vec3 p)
+{
+  float t = 0;
+  float scale = 1;
+  while (scale > 0.01)
+  {
+    float noise = Perlin(p / scale) * scale;
+    t += abs(noise);
+    scale /= 2;
+  }
+  return t;
 }
