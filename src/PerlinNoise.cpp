@@ -67,10 +67,10 @@ float* PerlinNoise::Generate3DTexture(int dimension)
       {
         float x = i / dim;
         glm::vec3 pos(x, y, z);
-        float r = Noise(pos, 4, 128);
-        float g = Noise(pos, 8, 64);
-        float b = Noise(pos, 16, 32);
-        float a = Noise(pos, 32, 16);
+        float r = Noise(pos, 8, 1);
+        float g = Noise(pos, 16, 1);
+        float b = Noise(pos, 32, 1);
+        float a = Noise(pos, 64, 1);
 
         noise[count++] = r;
         noise[count++] = g;

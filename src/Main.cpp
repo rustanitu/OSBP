@@ -21,7 +21,7 @@ Manipulator* manip = NULL;
 Sphere sphere;
 const float quad_size = 15;
 Quad quad(quad_size);
-Quad corona(4);
+Quad corona(10);
 static float s_time = 0.7;
 static float s_delta = 0.005;
 
@@ -188,7 +188,10 @@ void TimeStep(int val)
   s_time += s_delta;
   
   if (s_time > 1.0f || s_time < 0.7)
+  {
     s_delta = -s_delta;
+    s_time += 2*s_delta;
+  }
 
   turb_rot = glm::rotate(turb_rot, 0.05f, glm::vec3(1, 0, 0));
 

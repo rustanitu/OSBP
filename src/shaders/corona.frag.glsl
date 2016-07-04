@@ -10,23 +10,28 @@ out vec4 colorout;
 
 vec4 corona_color(float r, float intens)
 {
-  float d = (0.9 - r)*(0.9 - r);
-  vec4 color = vec4(1, d, 0, d) * intens;
-  return color;
+  float a = 1 - r;
+  vec4 color = vec4(1, r, 0, 1) * intens;
+  return clamp(color, 0, 1);
 }
 
-vec4 corona(vec3 v, vec3 r)
+vec4 corona(vec3 v, float radius)
 {
-  float radius = length(r);
-  if (radius > 2 || radius < 0.9)
-    return vec4(0);
-  radius -= 1.0;
   vec4 tex = texture(turb_tex, v);
-  float dr = (tex.r + tex.g * 2 + tex.b + tex.a) / 80;
+  float dr = (8*tex.r + 4*tex.g + 4*tex.b);
   return corona_color(radius, dr);
 }
 
 void main()
 {
-  colorout = corona(texpos, vert);
+  colorout = vec4(0);
+  float radius = length(vert);
+  if (radius <= 1.5 && radius >= 1)
+  {
+    colorout = corona(texpos, radius-1);
+  }
+  
+  radius /= 5;
+  radius += 1;
+  colorout += vec4(1, radius - 0.8, 0, (2 - radius)*(2 - radius));
 }

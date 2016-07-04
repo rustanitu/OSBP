@@ -2,15 +2,14 @@
 
 in vec3 vert;
 
-uniform float time;
 uniform sampler3D noise_tex;
 
 out vec4 color;
 
 void main()
 {
-  vec4 tex = texture(noise_tex, vert * time);
-  color = vec4((tex.r + tex.g + tex.b + tex.a) / 200);
+  vec4 tex = texture(noise_tex, vert);
+  color = vec4((tex.r + tex.g + tex.b + tex.a) / 4);
   color *= 0.5;
   color += 0.5;
 
@@ -21,7 +20,7 @@ void main()
   
   color = clamp(color, 0, 1);
 
-  vec4 red = abs(color - vec4(1)) * vec4(1,0,0,0);
+  vec4 red = abs(color - vec4(1)) * vec4(0.5,0,0,0);
   vec4 yellow = color * vec4(1,1,0, 0);
   
   
