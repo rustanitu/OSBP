@@ -151,5 +151,11 @@
     <None Include="..\src\shaders\sun.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\src\shaders\sunlight.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\src\shaders\sunlight.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

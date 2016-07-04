@@ -17,11 +17,12 @@
 int W = 800;
 int H = 600;
 Camera* cam = NULL;
-Manipulator* manip = NULL;
 Sphere sphere;
 const float quad_size = 15;
+const float quad_light_size = 10;
 Quad quad(quad_size);
-Quad corona(10);
+Quad corona(3);
+Quad sun_light(quad_light_size);
 static float s_time = 0.7;
 static float s_delta = 0.005;
 
@@ -32,7 +33,8 @@ GLuint sky_noise_buff;
 GLuint sky_noise_buff_size = 1024;
 float* sky_buff = NULL;
 
-ShaderProgram* planet_shader = NULL;
+ShaderProgram* sun_shader = NULL;
+ShaderProgram* sun_light_shader = NULL;
 ShaderProgram* sky_shader = NULL;
 ShaderProgram* corona_shader = NULL;
 
@@ -93,11 +95,17 @@ void Init()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  planet_shader = new ShaderProgram();
-  planet_shader->Init();
-  planet_shader->CreateShader("shaders\\sun.vert.glsl", GL_VERTEX_SHADER);
-  planet_shader->CreateShader("shaders\\sun.frag.glsl", GL_FRAGMENT_SHADER);
-  planet_shader->LinkProgram();
+  sun_shader = new ShaderProgram();
+  sun_shader->Init();
+  sun_shader->CreateShader("shaders\\sun.vert.glsl", GL_VERTEX_SHADER);
+  sun_shader->CreateShader("shaders\\sun.frag.glsl", GL_FRAGMENT_SHADER);
+  sun_shader->LinkProgram();
+
+  sun_light_shader = new ShaderProgram();
+  sun_light_shader->Init();
+  sun_light_shader->CreateShader("shaders\\sunlight.vert.glsl", GL_VERTEX_SHADER);
+  sun_light_shader->CreateShader("shaders\\sunlight.frag.glsl", GL_FRAGMENT_SHADER);
+  sun_light_shader->LinkProgram();
 
   corona_shader = new ShaderProgram();
   corona_shader->Init();
@@ -116,20 +124,24 @@ void Init()
   cam->SetAt(0, 0, 0);
   cam->SetupCamera();
 
-  sphere.Init(planet_shader, cam);
+  quad.Init(sky_shader, cam);
+  quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  quad.TransferData();
+
+  sphere.Init(sun_shader, cam);
   sphere.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
   sphere.TransferData();
   Manipulator::SetCurrent(sphere.GetManipulator());
 
-  quad.Init(sky_shader, cam);
-  quad.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
-  quad.TransferData();
+  sun_light.Init(sun_light_shader, cam);
+  sun_light.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
+  sun_light.TransferData();
+  sun_light.Translate(0, 0, 0.1f);
 
   corona.Init(corona_shader, cam);
   corona.SetVertexAttribute("vertex", 0, GL_ARRAY_BUFFER);
   corona.TransferData();
   corona.Translate(0, 0, 0.2f);
-  //Manipulator::SetCurrent(quad.GetManipulator());
 }
 
 void RenderScene()
@@ -145,22 +157,33 @@ void RenderScene()
   sky_shader->SetUniform("size", quad_size);
   quad.Draw();
 
-  planet_shader->UseProgram();
+  sun_shader->UseProgram();
 
   glActiveTexture(GL_TEXTURE0 + planet_noise_buff);
   glBindTexture(GL_TEXTURE_3D, planet_noise_buff);
-  planet_shader->SetUniform("noise_tex", planet_noise_buff);
+  sun_shader->SetUniform("noise_tex", planet_noise_buff);
 
   mvp = cam->m_proj * cam->m_view * sphere.GetModel();
-  planet_shader->SetUniform("mvp", mvp);
-  planet_shader->SetUniform("time", s_time);
+  sun_shader->SetUniform("mvp", mvp);
+  sun_shader->SetUniform("time", s_time);
   sphere.Draw();
+
+  sun_light_shader->UseProgram();
+  mvp = cam->m_proj * cam->m_view * sun_light.GetModel();
+  sun_light_shader->SetUniform("mvp", mvp);
+  sun_light_shader->SetUniform("size", quad_light_size / 2.0f);
+  sun_light.Draw();
 
   corona_shader->UseProgram();
 
   glActiveTexture(GL_TEXTURE0 + planet_noise_buff);
   glBindTexture(GL_TEXTURE_3D, planet_noise_buff);
   corona_shader->SetUniform("turb_tex", planet_noise_buff);
+
+  glActiveTexture(GL_TEXTURE0 + sky_noise_buff);
+  glBindTexture(GL_TEXTURE_2D, sky_noise_buff);
+  corona_shader->SetUniform("noise_tex", sky_noise_buff);
+
   corona_shader->SetUniform("turb_rot", turb_rot);
   mvp = cam->m_proj * cam->m_view * corona.GetModel();
   corona_shader->SetUniform("mvp", mvp);
@@ -193,7 +216,7 @@ void TimeStep(int val)
     s_time += 2*s_delta;
   }
 
-  turb_rot = glm::rotate(turb_rot, 0.05f, glm::vec3(1, 0, 0));
+  turb_rot = glm::rotate(turb_rot, 0.02f, glm::vec3(1, 0, 0));
 
   glutTimerFunc(val, TimeStep, val);
 }
@@ -223,10 +246,9 @@ int main (int argc, char* argv[])
   delete[] planet_buff;
   delete[] sky_buff;
 
-  delete planet_shader;
+  delete sun_shader;
   delete sky_shader;
   delete cam;
-  delete manip;
 
   return 0;
 }
