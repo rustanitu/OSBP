@@ -19,7 +19,7 @@ vec4 corona(vec3 v, float radius)
 {
   vec4 tex = texture(turb_tex, v);
   float dr = (8*tex.r + 4*tex.g + 4*tex.b);
-  return corona_color(radius, dr);
+  return corona_color(radius, 1);
 }
 
 void main()
