@@ -11,7 +11,8 @@ void main()
   if (radius <= 1)
   {
     radius += 1;
-    color = vec4(1, radius - 0.8, 0, (2 - radius)*(2 - radius));
+    float y = 0.5 * (radius - 1) * (radius - 1) + 0.5;
+    color = vec4(1, y, 0, (2 - radius)*(2 - radius));
   }
   else
     color = vec4(0);

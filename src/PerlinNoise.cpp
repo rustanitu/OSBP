@@ -124,7 +124,7 @@ float* PerlinNoise::Generate2DTexture(int dimension)
       glm::vec3 pos(x, y, 0);
       float r = Noise(pos, 4, 1);
       float g = Noise(pos, 8, 1);
-      float b = Noise(pos, 240, 2);
+      float b = Noise(pos, 200, 1);
       float a = Noise(pos, 254, 1);
 
       noise[count++] = r;
