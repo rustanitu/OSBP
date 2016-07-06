@@ -9,7 +9,7 @@ uniform sampler2D noise_tex;
 
 out vec4 colorout;
 
-vec4 corona_color(float r, float intens, float shi)
+vec4 corona_color(float r, float intens)
 {
   float a = 2 * (r - 0.5) * (r - 0.5) * (r - 0.5) * (r - 0.5);
   float yel = 0.5 + r;
@@ -20,10 +20,9 @@ vec4 corona_color(float r, float intens, float shi)
 vec4 corona(vec3 v, float radius)
 {
   vec4 tex = texture(turb_tex, v);
-  vec4 shi = texture(noise_tex, v.xy);
   float dr = (tex.r + tex.g + tex.b) * 5 + tex.a * 3;
   dr *= dr;
-  return corona_color(radius + 0.15, dr, abs(shi.g));
+  return corona_color(radius + 0.15, dr);
 }
 
 void main()

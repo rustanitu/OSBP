@@ -48,9 +48,8 @@ void main()
       lstar > ln7 && ln7 > 0.25 )
     star = vec3(1);
   
-  //color += vec4(star, 1);
-  color = vec4(tex.r, (tex.g + tex.r)/4, tex.g, 0);
-  color *= 0.25;
+  color = vec4(tex.r, 0, tex.g * 0.5 + 0.25, 0);
+  color *= 0.2;
   color.a = 1;
   color += vec4(star, 1);
 }

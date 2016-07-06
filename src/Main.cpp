@@ -146,17 +146,22 @@ void Init()
 
 void RenderScene()
 {
+  glm::mat4 mvp;
+
+  // Sky Render
   sky_shader->UseProgram();
 
   glActiveTexture(GL_TEXTURE0 + sky_noise_buff);
   glBindTexture(GL_TEXTURE_2D, sky_noise_buff);
   sky_shader->SetUniform("noise_tex", sky_noise_buff);
 
-  glm::mat4 mvp = cam->m_proj * cam->m_view * quad.GetModel();
+  mvp = cam->m_proj * cam->m_view * quad.GetModel();
   sky_shader->SetUniform("mvp", mvp);
   sky_shader->SetUniform("size", quad_size);
   quad.Draw();
 
+  
+  // Sun Render
   sun_shader->UseProgram();
 
   glActiveTexture(GL_TEXTURE0 + planet_noise_buff);
@@ -168,12 +173,16 @@ void RenderScene()
   sun_shader->SetUniform("time", s_time);
   sphere.Draw();
 
+
+  // Sun Light Render
   sun_light_shader->UseProgram();
   mvp = cam->m_proj * cam->m_view * sun_light.GetModel();
   sun_light_shader->SetUniform("mvp", mvp);
   sun_light_shader->SetUniform("size", quad_light_size / 2.0f);
   sun_light.Draw();
 
+
+  // Corona Render
   corona_shader->UseProgram();
 
   glActiveTexture(GL_TEXTURE0 + planet_noise_buff);

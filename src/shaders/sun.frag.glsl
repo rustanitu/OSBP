@@ -13,13 +13,11 @@ void main()
   color *= 0.5;
   color += 0.5;
 
-  vec4 light = abs(color) - vec4(0.5);
-  vec4 shi = light * vec4(1) * 2;
+  vec4 light = color - vec4(0.5);
+  vec4 shi = light * vec4(2);
   light = clamp(light, 0, 1);
   light += shi;
   
-  color = clamp(color, 0, 1);
-
   vec4 red = abs(color - vec4(1)) * vec4(0.5,0,0,0);
   vec4 yellow = color * vec4(1,1,0, 0);
   
